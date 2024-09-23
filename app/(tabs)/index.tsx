@@ -1,60 +1,57 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { StyleSheet, ScrollView } from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import OrderCard from '@/components/orders/OrderCard';
 
 export default function HomeScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <ScrollView style={styles.mainContainer}>
+      <ThemedText type="title" style={styles.title}>
+        Lista de órdenes
+      </ThemedText>
+      <ThemedText type="default" style={styles.description}>
+        Revisa todas las órdenes han sido asignadas a tu flota.
+      </ThemedText>
+      <OrderCard
+        driverName="Carlos Sousa"
+        carModel="BMW X5"
+        origin="Chacao, La Castellana"
+        destination="Baruta, La Trinidad"
+        distance="10 km"
+        duration="1 hr 30 min"
+        id={'1'}
+      />
+      <OrderCard
+        driverName="Enrique Gonzalez"
+        carModel="Chevrolet Grand Vitara"
+        origin="Chacao, La Castellana"
+        destination="Baruta, La Trinidad"
+        distance="10 km"
+        duration="1 hr 30 min"
+        id={'2'}
+      />
+      <OrderCard
+        driverName="Carlos Sousa"
+        carModel="BMW X5"
+        origin="Chacao, La Castellana"
+        destination="Baruta, La Trinidad"
+        distance="10 km"
+        duration="1 hr 30 min"
+        id={'3'}
+      />
+      <ThemedText type="default" style={styles.footer}>
+        Creado y diseñado por el Equipo Nro. 9
+      </ThemedText>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  mainContainer: {
+    padding: 24,
+  },
+  title: {
+    marginTop: 54,
   },
   stepContainer: {
     gap: 8,
@@ -66,5 +63,16 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     position: 'absolute',
+  },
+  description: {
+    color: 'gray',
+    marginBottom: 16,
+  },
+  footer: {
+    color: 'gray',
+    paddingTop: 46,
+    paddingBottom: 36,
+    textAlign: 'center',
+    fontSize: 12,
   },
 });
