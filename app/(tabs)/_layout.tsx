@@ -39,12 +39,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="orders"
-        options={{
-          href: null,
-        }}
-      />
     </Tabs>
   );
 }

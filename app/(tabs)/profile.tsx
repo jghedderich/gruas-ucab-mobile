@@ -1,4 +1,7 @@
 import { Section } from '@/components/common/Section';
+import OrderCard from '@/components/orders/OrderCard';
+import { InfoItem } from '@/components/profile/InfoItem';
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
   View,
@@ -7,7 +10,6 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 type DriverStatus = 'available' | 'unavailable' | 'busy';
 
@@ -33,7 +35,7 @@ export default function DriverProfileScreen({
   company = 'Quick Tow Inc.',
   truck = 'Truck #123',
   email = 'john.doe@quicktow.com',
-  dni = '123456789',
+  dni = 'V123456789',
   phone = '+1 (555) 123-4567',
   status = 'available',
   completedOrders = [
@@ -58,47 +60,73 @@ export default function DriverProfileScreen({
   };
 
   return (
-    <Section title="Perfil" subtitle="Información del conductor">
-      <Text style={styles.name}>{name}</Text>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={[
-            styles.statusBadge,
-            { backgroundColor: statusColors[currentStatus] },
-          ]}
-          onPress={toggleStatus}
-        >
-          <Text style={styles.statusText}>{currentStatus}</Text>
-        </TouchableOpacity>
-      </View>
-
+    <Section
+      title={name}
+      subtitle={company}
+      trailing={
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={[
+              styles.statusBadge,
+              { backgroundColor: statusColors[currentStatus] },
+            ]}
+            onPress={toggleStatus}
+          >
+            <Text style={styles.statusText}>{currentStatus}</Text>
+          </TouchableOpacity>
+        </View>
+      }
+    >
       <View style={styles.infoSection}>
-        <InfoItem label="Company" value={company} />
-        <InfoItem label="Assigned Truck" value={truck} />
-        <InfoItem label="Email" value={email} />
-        <InfoItem label="DNI" value={dni} />
-        <InfoItem label="Phone" value={phone} />
+        <InfoItem
+          icon={<Ionicons name="car" size={20} color="#666" />}
+          value={truck}
+        />
+        <InfoItem
+          icon={<Ionicons name="mail" size={20} color="#666" />}
+          value={email}
+        />
+        <InfoItem
+          icon={<Ionicons name="id-card" size={20} color="#666" />}
+          value={dni}
+        />
+        <InfoItem
+          icon={<Ionicons name="call" size={20} color="#666" />}
+          value={phone}
+        />
       </View>
 
       <View style={styles.ordersSection}>
-        <Text style={styles.sectionTitle}>Completed Orders</Text>
-        {completedOrders.map((order) => (
-          <View key={order.id} style={styles.orderItem}>
-            <Text style={styles.orderDate}>{order.date}</Text>
-            <Text style={styles.orderLocation}>{order.location}</Text>
-          </View>
-        ))}
+        <Text style={styles.sectionTitle}>Órdenes completadas</Text>
+        <OrderCard
+          driverName="Carlos Sousa"
+          carModel="BMW X5"
+          origin="Chacao, La Castellana"
+          destination="Baruta, La Trinidad"
+          distance="10 km"
+          duration="1 hr 30 min"
+          id={'1'}
+        />
+        <OrderCard
+          driverName="Enrique Gonzalez"
+          carModel="Chevrolet Grand Vitara"
+          origin="Chacao, La Castellana"
+          destination="Baruta, La Trinidad"
+          distance="10 km"
+          duration="1 hr 30 min"
+          id={'2'}
+        />
+        <OrderCard
+          driverName="Carlos Sousa"
+          carModel="BMW X5"
+          origin="Chacao, La Castellana"
+          destination="Baruta, La Trinidad"
+          distance="10 km"
+          duration="1 hr 30 min"
+          id={'3'}
+        />
       </View>
     </Section>
-  );
-}
-
-function InfoItem({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.infoItem}>
-      <Text style={styles.infoLabel}>{label}:</Text>
-      <Text style={styles.infoValue}>{value}</Text>
-    </View>
   );
 }
 
@@ -108,13 +136,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    marginTop: 16,
   },
   name: {
     fontSize: 24,
@@ -131,36 +153,15 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
   },
   infoSection: {
-    backgroundColor: '#ffffff',
-    marginTop: 16,
-    paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
-  },
-  infoItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  infoLabel: {
-    fontWeight: 'bold',
-    color: '#757575',
-  },
-  infoValue: {
-    color: '#212121',
   },
   ordersSection: {
-    backgroundColor: '#ffffff',
     marginTop: 16,
     marginBottom: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 8,
   },
