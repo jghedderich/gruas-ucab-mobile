@@ -11,6 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { faker } from '@faker-js/faker';
 import MapComponent from '@/components/orders/MapComponent';
+import { Link } from 'expo-router';
 
 // Styles object is assumed to be defined elsewhere
 
@@ -102,12 +103,13 @@ export default function ServiceRequestDetail() {
         </View>
       </ScrollView>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.extraCostsButton}>
-          <Text style={styles.extraCostsButtonText}>Costos extra</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.acceptButton}>
-          <Text style={styles.buttonText}>Aceptar Orden</Text>
-        </TouchableOpacity>
+        <Link href="/orders/accepted" asChild>
+          <TouchableOpacity style={styles.acceptButton}>
+            <Text style={styles.buttonText}>
+              <Text style={styles.buttonText}>Aceptar Orden</Text>
+            </Text>
+          </TouchableOpacity>
+        </Link>
       </View>
     </SafeAreaView>
   );
@@ -174,10 +176,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 14,
     padding: 16,
+    height: 80,
   },
   acceptButton: {
     flex: 1,

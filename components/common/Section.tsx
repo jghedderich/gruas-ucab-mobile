@@ -39,10 +39,10 @@ export const Section = ({
 
 const styles = StyleSheet.create({
   mainContainer: {
-    padding: 24,
+    padding: 16,
   },
   title: {
-    marginTop: 54,
+    marginTop: 0,
   },
   description: {
     color: 'gray',
