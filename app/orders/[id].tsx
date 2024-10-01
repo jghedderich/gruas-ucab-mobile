@@ -178,6 +178,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     padding: 16,
     height: 80,
+    backgroundColor: 'white',
   },
   acceptButton: {
     flex: 1,

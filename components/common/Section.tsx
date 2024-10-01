@@ -1,61 +1,97 @@
 import React from 'react';
+import { View, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
 import { ThemedText } from '../ThemedText';
-import { ScrollView, View } from 'react-native';
-import { StyleSheet } from 'react-native';
 
 interface SectionProps {
   title: string;
   subtitle?: string;
   trailing?: React.ReactNode;
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  footer?: React.ReactNode;
 }
 
-export const Section = ({
+export const Section: React.FC<SectionProps> = ({
   title,
   subtitle,
   trailing,
   children,
-}: SectionProps) => {
+  footer,
+}) => {
   return (
-    <ScrollView style={styles.mainContainer}>
-      <View style={styles.header}>
-        <View>
-          <ThemedText type="title" style={styles.title}>
-            {title}
-          </ThemedText>
-          <ThemedText type="default" style={styles.description}>
-            {subtitle}
+    <SafeAreaView style={styles.container}>
+      <View style={styles.contentContainer}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollViewContent}
+        >
+          <View style={styles.header}>
+            <View>
+              <ThemedText type="title" style={styles.title}>
+                {title}
+              </ThemedText>
+              {subtitle && (
+                <ThemedText type="default" style={styles.description}>
+                  {subtitle}
+                </ThemedText>
+              )}
+            </View>
+            {trailing}
+          </View>
+          {children}
+        </ScrollView>
+      </View>
+      {footer ? (
+        <View style={styles.footer}>{footer}</View>
+      ) : (
+        <View style={styles.footer}>
+          <ThemedText type="default" style={styles.footerText}>
+            Creado y diseñado por el Equipo Nro. 9
           </ThemedText>
         </View>
-        {trailing}
-      </View>
-      {children}
-      <ThemedText type="default" style={styles.footer}>
-        Creado y diseñado por el Equipo Nro. 9
-      </ThemedText>
-    </ScrollView>
+      )}
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  mainContainer: {
+  container: {
+    flex: 1,
+  },
+  contentContainer: {
+    flex: 1,
+    marginBottom: 50, // Adjust this value based on your footer height
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollViewContent: {
     padding: 16,
-  },
-  title: {
-    marginTop: 0,
-  },
-  description: {
-    color: 'gray',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 16,
+  },
+  title: {
+    marginTop: 0,
+    marginBottom: 8,
+  },
+  description: {
+    color: 'gray',
   },
   footer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingTop: 20,
+    paddingBottom: 40,
+    paddingHorizontal: 16,
+    backgroundColor: 'white', // Adjust this to match your app's background
+  },
+  footerText: {
     color: 'gray',
-    paddingTop: 46,
-    paddingBottom: 36,
     textAlign: 'center',
     fontSize: 12,
   },
