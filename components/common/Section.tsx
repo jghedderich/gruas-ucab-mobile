@@ -18,7 +18,7 @@ export const Section: React.FC<SectionProps> = ({
   footer,
 }) => {
   return (
-    <SafeAreaView style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.contentContainer}>
         <ScrollView
           style={styles.scrollView}
@@ -40,16 +40,8 @@ export const Section: React.FC<SectionProps> = ({
           {children}
         </ScrollView>
       </View>
-      {footer ? (
-        <View style={styles.footer}>{footer}</View>
-      ) : (
-        <View style={styles.footer}>
-          <ThemedText type="default" style={styles.footerText}>
-            Creado y diseñado por el Equipo Nro. 9
-          </ThemedText>
-        </View>
-      )}
-    </SafeAreaView>
+      {footer && <View style={styles.footer}>{footer}</View>}
+    </ScrollView>
   );
 };
 
@@ -65,7 +57,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollViewContent: {
-    padding: 16,
+    padding: 24,
   },
   header: {
     flexDirection: 'row',

@@ -19,7 +19,6 @@ const styles = StyleSheet.create({
   infoItem: {
     flexDirection: 'row',
     gap: 8,
-    paddingVertical: 8,
   },
   infoLabel: {
     fontWeight: 'bold',
@@ -27,5 +26,6 @@ const styles = StyleSheet.create({
   },
   infoValue: {
     color: '#212121',
+    fontSize: 16,
   },
 });

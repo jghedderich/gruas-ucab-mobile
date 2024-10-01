@@ -9,8 +9,16 @@ export default function IdentifiedScreen() {
       subtitle="Puede solicitar costos adicionales o proceder a realizar el servicio. Estos deberán ser aprobados por el operador de cabina."
       footer={
         <View style={styles.buttonContainer}>
-          <LinkButton href={'/orders/request-costs'} text="Solicitar costos" />
-          <LinkButton href={'/orders/destiny'} text="Realizar servicio" />
+          <LinkButton
+            href={'/orders/request-costs'}
+            text="Solicitar costos"
+            variant="outline"
+          />
+          <LinkButton
+            href={'/orders/destiny'}
+            text="Realizar servicio"
+            variant="default"
+          />
         </View>
       }
     >
