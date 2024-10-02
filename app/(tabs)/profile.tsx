@@ -3,6 +3,7 @@ import CompletedOrderCard from '@/components/orders/CompletedOrderCard';
 import OrderCard from '@/components/orders/OrderCard';
 import { InfoItem } from '@/components/profile/InfoItem';
 import { Ionicons } from '@expo/vector-icons';
+import { Link } from 'expo-router';
 import React, { useState } from 'react';
 import {
   View,
@@ -85,20 +86,27 @@ export default function DriverProfileScreen({
       <Section
         title={name}
         subtitle={company}
-        trailing={
-          <View style={styles.header}>
-            <TouchableOpacity
-              style={[
-                styles.statusBadge,
-                { backgroundColor: statusColors[currentStatus] },
-              ]}
-              onPress={toggleStatus}
-            >
-              <Text style={styles.statusText}>{currentStatus}</Text>
-            </TouchableOpacity>
-          </View>
+        leading={
+          <Ionicons name="person-circle-outline" size={60} color="#666" />
         }
       >
+        <View style={styles.statusSection}>
+          <Link href="/account" asChild>
+            <TouchableOpacity style={styles.editButton}>
+              <Ionicons name="pencil" size={14} color="#666" />
+              <Text style={styles.editText}>Editar perfil</Text>
+            </TouchableOpacity>
+          </Link>
+          <TouchableOpacity
+            style={[
+              styles.statusBadge,
+              { backgroundColor: statusColors[currentStatus] },
+            ]}
+            onPress={toggleStatus}
+          >
+            <Text style={styles.statusText}>{currentStatus}</Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.infoSection}>
           <InfoItem
             icon={<Ionicons name="car" size={16} color="#666" />}
@@ -122,6 +130,7 @@ export default function DriverProfileScreen({
           <Text style={styles.sectionTitle}>Órdenes completadas</Text>
           {completedOrders.map((order) => (
             <CompletedOrderCard
+              key={order.date}
               customerName={order.customerName}
               vehicleInfo={order.vehicleInfo}
               date={order.date}
@@ -147,14 +156,35 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
   },
+  statusSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 8,
+  },
+  editButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'lightgray',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 16,
+  },
+  editText: {
+    color: '#666',
+    fontWeight: 'bold',
+  },
   statusBadge: {
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 7,
+    width: 100,
     borderRadius: 16,
   },
   statusText: {
     color: '#ffffff',
     fontWeight: 'bold',
+    textAlign: 'center',
     textTransform: 'capitalize',
   },
   infoSection: {

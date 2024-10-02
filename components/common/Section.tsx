@@ -6,6 +6,7 @@ interface SectionProps {
   title: string;
   subtitle?: string;
   trailing?: React.ReactNode;
+  leading?: React.ReactNode;
   children?: React.ReactNode;
   footer?: React.ReactNode;
 }
@@ -14,6 +15,7 @@ export const Section: React.FC<SectionProps> = ({
   title,
   subtitle,
   trailing,
+  leading,
   children,
   footer,
 }) => {
@@ -25,6 +27,7 @@ export const Section: React.FC<SectionProps> = ({
           contentContainerStyle={styles.scrollViewContent}
         >
           <View style={styles.header}>
+            {leading}
             <View>
               <ThemedText type="title" style={styles.title}>
                 {title}
@@ -61,8 +64,8 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    gap: 16,
     marginBottom: 16,
   },
   title: {
