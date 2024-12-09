@@ -1,9 +1,9 @@
-import { Section } from '@/components/common/Section';
+import { Section } from '@/components/common/Section'; 
 import CompletedOrderCard from '@/components/orders/CompletedOrderCard';
-import OrderCard from '@/components/orders/OrderCard';
 import { InfoItem } from '@/components/profile/InfoItem';
 import { Ionicons } from '@expo/vector-icons';
-import { Link } from 'expo-router';
+import { useUser } from '@/app/context/UserContext'; 
+import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   View,
@@ -13,36 +13,22 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-type DriverStatus = 'available' | 'unavailable' | 'busy';
+export default function DriverProfileScreen() {
+  
+  const { user, setUser } = useUser(); // Obtenemos el usuario logueado del contexto
+  // console.log('Usuario logueado:', user);
+  const router = useRouter();
+  const [currentStatus, setCurrentStatus] = useState<string>(
+    user?.status || 'available'
+  );
 
-interface Order {
-  customerName: string;
-  vehicleInfo: string;
-  date: string;
-  totalAmount: number;
-  distance: number;
-}
+  const statusColors: Record<string, string> = {
+    available: '#4CAF50',
+    unavailable: '#F44336',
+    busy: '#FFC107',
+  };
 
-interface DriverProfileProps {
-  name: string;
-  company: string;
-  truck: string;
-  email: string;
-  dni: string;
-  phone: string;
-  status: DriverStatus;
-  completedOrders: Order[];
-}
-
-export default function DriverProfileScreen({
-  name = 'John Doe',
-  company = 'Quick Tow Inc.',
-  truck = 'Truck #123',
-  email = 'john.doe@quicktow.com',
-  dni = 'V123456789',
-  phone = '+1 (555) 123-4567',
-  status = 'available',
-  completedOrders = [
+  const completedOrders = [
     {
       customerName: 'Carlos Sousa',
       vehicleInfo: 'BMW X5',
@@ -64,28 +50,30 @@ export default function DriverProfileScreen({
       totalAmount: 3000,
       distance: 30,
     },
-  ],
-}: DriverProfileProps) {
-  const [currentStatus, setCurrentStatus] = useState<DriverStatus>(status);
-
-  const statusColors = {
-    available: '#4CAF50',
-    unavailable: '#F44336',
-    busy: '#FFC107',
-  };
+  ];
 
   const toggleStatus = () => {
-    const statusOrder: DriverStatus[] = ['available', 'unavailable', 'busy'];
+    const statusOrder: string[] = ['available', 'unavailable', 'busy'];
     const currentIndex = statusOrder.indexOf(currentStatus);
     const nextIndex = (currentIndex + 1) % statusOrder.length;
     setCurrentStatus(statusOrder[nextIndex]);
   };
 
+  const handleLogout = () => {
+    setUser(null); // Borro el usuario del contexto
+    router.push('/login'); // Vamos al login
+  };
+
   return (
     <ScrollView style={styles.container}>
+      {/* Botón para salir */}
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Ionicons name="log-out-outline" size={40} color="#666" />
+      </TouchableOpacity>
+
       <Section
-        title={name}
-        subtitle={company}
+        title={user?.name || 'Sin Nombre'}
+        subtitle={user?.company || 'Sin Compañía'}
         leading={
           <Ionicons name="person-circle-outline" size={60} color="#666" />
         }
@@ -100,7 +88,7 @@ export default function DriverProfileScreen({
           <TouchableOpacity
             style={[
               styles.statusBadge,
-              { backgroundColor: statusColors[currentStatus] },
+              { backgroundColor: statusColors[currentStatus] || '#666' },
             ]}
             onPress={toggleStatus}
           >
@@ -110,36 +98,36 @@ export default function DriverProfileScreen({
         <View style={styles.infoSection}>
           <InfoItem
             icon={<Ionicons name="car" size={16} color="#666" />}
-            value={truck}
+            value={user?.truck || 'Sin vehículo'}
           />
           <InfoItem
             icon={<Ionicons name="mail" size={16} color="#666" />}
-            value={email}
+            value={user?.email || 'Sin correo'}
           />
           <InfoItem
             icon={<Ionicons name="id-card" size={16} color="#666" />}
-            value={dni}
+            value={user?.dni || 'Sin DNI'}
           />
           <InfoItem
             icon={<Ionicons name="call" size={16} color="#666" />}
-            value={phone}
+            value={user?.phone || 'Sin Teléfono'}
           />
         </View>
-
-        <View style={styles.ordersSection}>
-          <Text style={styles.sectionTitle}>Órdenes completadas</Text>
-          {completedOrders.map((order) => (
-            <CompletedOrderCard
-              key={order.date}
-              customerName={order.customerName}
-              vehicleInfo={order.vehicleInfo}
-              date={order.date}
-              totalAmount={order.totalAmount}
-              distance={order.distance}
-            />
-          ))}
-        </View>
       </Section>
+
+      <View style={styles.ordersSection}>
+        <Text style={styles.sectionTitle}>Órdenes completadas</Text>
+        {completedOrders.map((order) => (
+          <CompletedOrderCard
+            key={order.date}
+            customerName={order.customerName}
+            vehicleInfo={order.vehicleInfo}
+            date={order.date}
+            totalAmount={order.totalAmount}
+            distance={order.distance}
+          />
+        ))}
+      </View>
     </ScrollView>
   );
 }
@@ -148,13 +136,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 54,
+    paddingHorizontal: 16,
   },
-  header: {
-    marginTop: 16,
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  logoutButton: {
+    position: 'absolute',
+    top: 20,
+    right: 16,
+    zIndex: 10,
+    padding: 8,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
   },
   statusSection: {
     flexDirection: 'row',
@@ -178,7 +169,7 @@ const styles = StyleSheet.create({
   statusBadge: {
     paddingHorizontal: 12,
     paddingVertical: 7,
-    width: 100,
+    width: 110,
     borderRadius: 16,
   },
   statusText: {
@@ -193,25 +184,12 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   ordersSection: {
-    marginTop: 16,
+    marginTop: -40,
     marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 8,
-  },
-  orderItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  orderDate: {
-    fontWeight: 'bold',
-  },
-  orderLocation: {
-    color: '#757575',
   },
 });

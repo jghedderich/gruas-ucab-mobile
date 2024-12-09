@@ -1,30 +1,40 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Button } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Link, useNavigation } from 'expo-router';
+import { useOrder } from '@/app/context/OrderContext';
+import { Link } from 'expo-router';
 
 interface OrderCardProps {
-  id: string;
+  orderId: string;
   driverName: string;
   carModel: string;
   origin: string;
   destination: string;
   distance: string;
   duration: string;
+  userId: string;
 }
 
 export default function OrderCard({
-  id,
+  orderId,
   driverName,
   carModel,
   origin,
   destination,
   distance,
   duration,
+  userId,
 }: OrderCardProps) {
+  const { setSelectedOrderId } = useOrder();  // Utiliza la nueva función del contexto
+
+  const handlePress = () => {
+    setSelectedOrderId(orderId);  // Al hacer clic, guarda el ID en el contexto
+    // console.log('ID de la orden seleccionada:', orderId);
+  };
+
   return (
-    <Link href={`/orders/${id}`} asChild>
-      <TouchableOpacity style={styles.card} activeOpacity={0.8}>
+    <Link href={`/orders/${orderId}`} asChild>
+      <TouchableOpacity onPress={handlePress} style={styles.card} activeOpacity={0.8}>
         <View style={styles.header}>
           <View>
             <Text style={styles.driverName}>{driverName}</Text>

@@ -6,6 +6,8 @@ import {
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { UserProvider } from '@/app/context/UserContext'; 
+import { OrderProvider } from '@/app/context/OrderContext'; 
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
@@ -32,13 +34,17 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <UserProvider>
+      <OrderProvider>
+        <SafeAreaProvider>
+          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }}/>
+              <Stack.Screen name="+not-found" />
+            </Stack>
+          </ThemeProvider>
+        </SafeAreaProvider>
+      </OrderProvider>
+    </UserProvider>
   );
 }

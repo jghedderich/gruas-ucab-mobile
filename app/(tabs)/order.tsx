@@ -2,8 +2,9 @@ import { StyleSheet, ScrollView } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import OrderCard from '@/components/orders/OrderCard';
+import Tabs from '@/components/common/Navbar';
 
-export default function HomeScreen() {
+export default function OrderScreen() {
   return (
     <ScrollView style={styles.mainContainer}>
       <ThemedText type="title" style={styles.title}>
@@ -41,8 +42,11 @@ export default function HomeScreen() {
       />
       <ThemedText type="default" style={styles.footer}>
         Creado y diseñado por el Equipo Nro. 9
-      </ThemedText>
+      </ThemedText>     
+      
+     
     </ScrollView>
+  
   );
 }
 
@@ -76,3 +80,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
+
+// // app/order.tsx
+// import React from 'react';
+// import { View, Text } from 'react-native';
+
+// export default function OrderScreen() {
+//   return (
+//     <View>
+//       <Text>Orden</Text>
+//     </View>
+//   );
+// }
