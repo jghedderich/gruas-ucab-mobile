@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation, useRoute } from '@react-navigation/native'; 
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import MapComponent from '@/components/orders/MapComponent';
-import { Link } from 'expo-router';
-import { useOrder } from '@/app/context/OrderContext';  // Importa el hook correcto
-import { useUser } from '@/app/context/UserContext';  // Importa el hook para obtener el usuario
+import { useOrder } from '@/app/context/OrderContext';  
+import { useUser } from '@/app/context/UserContext';  
 
 // Define los parámetros esperados en la ruta
 type ServiceRequestDetailRouteParams = {
@@ -13,13 +13,11 @@ type ServiceRequestDetailRouteParams = {
 };
 
 export default function ServiceRequestDetail() {
+  const router = useRouter();
   const navigation = useNavigation();
-  
-  const { user } = useUser();  // Usamos el hook para obtener el usuario
- 
-  const { getOrderById, selectedOrderId } = useOrder();  // Usamos el hook para acceder a la función getOrderById
+  const { user } = useUser(); 
+  const { getOrderById, selectedOrderId } = useOrder();
 
-  // Asegúrate de que el usuario esté disponible
   if (!user) {
     return (
       <SafeAreaView style={styles.container}>
@@ -28,9 +26,8 @@ export default function ServiceRequestDetail() {
     );
   }
 
-  // Usamos la función getOrderById para obtener la orden por su ID
   const order = selectedOrderId ? getOrderById(selectedOrderId) : undefined;
-  // Si no se encuentra la orden, mostramos un mensaje
+
   if (!order || order.userId !== user.id) {
     return (
       <SafeAreaView style={styles.container}>
@@ -45,9 +42,21 @@ export default function ServiceRequestDetail() {
     );
   }
 
+  // Función para manejar el rechazo de la orden
+  const handleRejectOrder = () => {
+    console.log('Orden rechazada', order);
+    navigation.goBack(); // Vuelve a la pantalla anterior
+  };
+
+  // Función para manejar la aceptación de la orden
+  const handleAcceptOrder = () => {
+    router.push('/orders/accepted');
+    console.log('Orden aceptada', order);
+    // Aquí puedes implementar la lógica adicional cuando sea necesario
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Encabezado personalizado */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="black" />
@@ -79,10 +88,9 @@ export default function ServiceRequestDetail() {
             </View>
           </View>
           <MapComponent
-            latitude={0} // Aquí deberías poner las coordenadas reales del origen
-            longitude={0} // Aquí las coordenadas reales del origen
+            latitude={0} 
+            longitude={0} 
           />
-          
           <View style={styles.locationInfo}>
             <Text style={styles.locationTitle}>DESTINO</Text>
             <Text style={styles.locationName}>{order.destination}</Text>
@@ -98,8 +106,8 @@ export default function ServiceRequestDetail() {
             </View>
           </View>
           <MapComponent
-            latitude={0} // Aquí van las coordenadas reales del destino
-            longitude={0} // Aquí van las coordenadas reales del destino
+            latitude={0} 
+            longitude={0} 
           />
         </View>
       </ScrollView>
@@ -107,25 +115,21 @@ export default function ServiceRequestDetail() {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.acceptButton, { backgroundColor: '#FF3B30' }]}
-          onPress={() => {
-            // Aquí lógica personalizada para rechazar la orden
-            console.log('Orden rechazada', order);
-            navigation.goBack();
-          }}
+          onPress={handleRejectOrder}
         >
           <Text style={styles.buttonText}>Rechazar Orden</Text>
         </TouchableOpacity>
-        <Link href={{ pathname: '/orders/accepted'}} asChild>
-          <TouchableOpacity style={styles.acceptButton}>
-            <Text style={styles.buttonText}>Aceptar Orden</Text>
-          </TouchableOpacity>
-        </Link>
-
-        
+        <TouchableOpacity
+          style={styles.acceptButton}
+          onPress={handleAcceptOrder}
+        >
+          <Text style={styles.buttonText}>Aceptar Orden</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

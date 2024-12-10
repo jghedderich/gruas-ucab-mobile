@@ -1,17 +1,92 @@
-import { LinkButton } from '@/components/common/LinkButton';
 import { Section } from '@/components/common/Section';
+import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import MapComponent from '@/components/orders/MapComponent';
+import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 export default function DestinyScreen() {
+  const navigation = useNavigation();
+  const router = useRouter();
+  const handlePerformService = () => {
+    // Aquí implementar lógica adicional
+    console.log('Usuario ha confirmado que ha realizado el servicio.');
+    router.push('/orders/success'); 
+  };
   return (
-    <Section
-      title="Realice el servicio"
-      subtitle="Revise la dirección del destino en el mapa y consulte con el cliente para obtener más información."
-      footer={
-        <LinkButton href={'/orders/success'} text="He llegado al destino" />
-      }
-    >
-      <MapComponent latitude={10.0} longitude={10.0} />
-    </Section>
+    <View style={styles.screen}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.headerText}>Detalles de Solicitud</Text>
+      </View>
+
+      {/* Contenido principal */}
+      <View style={styles.content}>
+        <Section
+          title="Realice el servicio"
+          subtitle="Revise la dirección del destino en el mapa y consulte con el cliente para obtener más información."
+        >
+          <MapComponent latitude={10.0} longitude={10.0} />
+        </Section>
+      </View>
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        <TouchableOpacity onPress={handlePerformService} style={[styles.button, styles.primaryButton]}>
+          <Text style={styles.buttonText}>Realizar servicio</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#f9f9f9',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    marginTop: 60,
+  },
+  backButton: {
+    marginRight: 8,
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  footer: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+    backgroundColor: '#f9f9f9',
+  },
+  button: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  primaryButton: {
+    backgroundColor: '#007bff', // Azul primary
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff', // Texto blanco
+  },
+});
