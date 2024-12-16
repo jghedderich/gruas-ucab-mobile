@@ -79,11 +79,11 @@ export default function ServiceRequestDetail() {
             <View style={styles.locationDetails}>
               <Ionicons name="location-outline" size={14} color="#666" />
               <Text style={styles.locationText}>
-                {order.distance} km
+                {order.distance_arrival} km
               </Text>
               <Ionicons name="time-outline" size={14} color="#666" />
               <Text style={styles.locationText}>
-                {order.duration} min
+                {order.duration_arrival} min
               </Text>
             </View>
           </View>
@@ -97,11 +97,11 @@ export default function ServiceRequestDetail() {
             <View style={styles.locationDetails}>
               <Ionicons name="location-outline" size={14} color="#666" />
               <Text style={styles.locationText}>
-                {order.distance} km
+                {order.distance_back} km
               </Text>
               <Ionicons name="time-outline" size={14} color="#666" />
               <Text style={styles.locationText}>
-                {order.duration} min
+                {order.duration_back} min
               </Text>
             </View>
           </View>

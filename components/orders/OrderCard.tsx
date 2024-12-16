@@ -10,8 +10,10 @@ interface OrderCardProps {
   carModel: string;
   origin: string;
   destination: string;
-  distance: string;
-  duration: string;
+  distance_arrival: string;
+  duration_arrival: string;
+  distance_back: string;
+  duration_back: string;
   userId: string;
 }
 
@@ -21,8 +23,10 @@ export default function OrderCard({
   carModel,
   origin,
   destination,
-  distance,
-  duration,
+  distance_arrival,
+  duration_arrival,
+  distance_back,
+  duration_back,
   userId,
 }: OrderCardProps) {
   const { setSelectedOrderId } = useOrder();  // Utiliza la nueva función del contexto
@@ -52,9 +56,9 @@ export default function OrderCard({
             <Text style={styles.locationName}>{origin}</Text>
             <View style={styles.distanceTime}>
               <Ionicons name="navigate" size={14} color="#666" />
-              <Text style={styles.distanceTimeText}>{distance}</Text>
+              <Text style={styles.distanceTimeText}>{distance_arrival}</Text>
               <Ionicons name="time-outline" size={14} color="#666" />
-              <Text style={styles.distanceTimeText}>{duration}</Text>
+              <Text style={styles.distanceTimeText}>{duration_arrival}</Text>
             </View>
           </View>
           <View style={styles.locationColumn}>
@@ -62,9 +66,9 @@ export default function OrderCard({
             <Text style={styles.locationName}>{destination}</Text>
             <View style={styles.distanceTime}>
               <Ionicons name="navigate" size={14} color="#666" />
-              <Text style={styles.distanceTimeText}>{distance}</Text>
+              <Text style={styles.distanceTimeText}>{distance_back}</Text>
               <Ionicons name="time-outline" size={14} color="#666" />
-              <Text style={styles.distanceTimeText}>{duration}</Text>
+              <Text style={styles.distanceTimeText}>{duration_back}</Text>
             </View>
           </View>
         </View>

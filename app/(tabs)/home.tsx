@@ -10,8 +10,10 @@ interface Order {
   carModel: string;
   origin: string;
   destination: string;
-  distance: string;
-  duration: string;
+  distance_arrival: string;
+  duration_arrival: string;
+  distance_back: string;
+  duration_back: string;
   userId: string;
 }
 
@@ -52,8 +54,10 @@ export default function OrderScreen() {
             carModel={order.carModel}
             origin={order.origin}
             destination={order.destination}
-            distance={order.distance}
-            duration={order.duration}
+            distance_arrival={order.distance_arrival}
+            duration_arrival={order.duration_arrival}
+            distance_back={order.distance_back}
+            duration_back={order.duration_back}
             userId={order.userId}
           />
         ))

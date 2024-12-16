@@ -1,7 +1,14 @@
-import { LinkButton } from '@/components/common/LinkButton';
-import { View, Image, StyleSheet, Text } from 'react-native';
+import { View, Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 
 export default function SuccessScreen() {
+  const router = useRouter();
+  const handleButtonPress = () => {
+    // Lógica para marcar la orden como completada
+    console.log('Botón presionado. Ejecutando acción...');
+    router.push('/(tabs)/home')
+  };
+
   return (
     <View style={styles.screen}>
       {/* Cabecera: Título y Subtítulo */}
@@ -22,7 +29,9 @@ export default function SuccessScreen() {
 
       {/* Footer: Botón */}
       <View style={styles.footer}>
-        <LinkButton href={'/'} text="Continuar" />
+        <TouchableOpacity style={styles.button} onPress={handleButtonPress}>
+          <Text style={styles.buttonText}>Continuar</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -34,14 +43,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
   },
   header: {
-    paddingTop: 40, // Espaciado desde la parte superior
-    // paddingBottom: 20,
+    paddingTop: 40,
     marginTop: 30,
     paddingHorizontal: 16,
     backgroundColor: '#f9f9f9',
   },
   title: {
-    fontSize: 28, // Más grande para destacar
+    fontSize: 28,
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#333',
@@ -53,9 +61,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   content: {
-    flex: 1, // Ocupa el espacio restante
-    justifyContent: 'center', // Centra verticalmente
-    alignItems: 'center', // Centra horizontalmente
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   image: {
     width: 250,
@@ -66,5 +74,16 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#ddd',
     backgroundColor: '#fff',
+  },
+  button: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

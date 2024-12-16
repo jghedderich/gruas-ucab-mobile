@@ -38,10 +38,15 @@ export default function RequestCostsScreen() {
   };
 
   const handleSendRequest = () => {
-    // Aquí la lógica para enviar los costos
+    // Verifica si no hay costos adicionales
+    if (enteredCosts.length === 0) {
+      router.push('/orders/destiny'); 
+    } else {
+      router.push('/orders/costs-status'); 
+    }
     handleCloseModal();
-    router.push('/orders/costs-status');
   };
+  
 
   const enteredCosts = Object.entries(costs)
     .filter(([_, value]) => value)

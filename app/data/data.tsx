@@ -4,8 +4,10 @@ interface Orders {
   carModel: string;
   origin: string;
   destination: string;
-  distance: string;
-  duration: string;
+  distance_arrival: string;
+  duration_arrival: string;
+  distance_back: string;
+  duration_back: string;
   userId: string;
 }
 
@@ -22,8 +24,10 @@ const orders: Orders[] = [
     carModel: "BMW X5",
     origin: "Chacao, La Castellana",
     destination: "Baruta, La Trinidad",
-    distance: "10 km",
-    duration: "1 hr 30 min",
+    distance_arrival: "10 ",
+    duration_arrival: "1 hr 30",
+    distance_back: "8 ",
+    duration_back: "0 hr 45",
     userId: "1",
   },
   {
@@ -32,8 +36,10 @@ const orders: Orders[] = [
     carModel: "Chevrolet Grand Vitara",
     origin: "Chacao, La Castellana",
     destination: "Baruta, La Trinidad",
-    distance: "10 km",
-    duration: "1 hr 30 min",
+    distance_arrival: "10 ",
+    duration_arrival: "1 hr 30 ",
+    distance_back: "8 ",
+    duration_back: "0 hr 45 ",
     userId: "1",
   },
   {
@@ -42,8 +48,10 @@ const orders: Orders[] = [
     carModel: "BMW X5",
     origin: "Chacao, La Castellana",
     destination: "Baruta, La Trinidad",
-    distance: "10 km",
-    duration: "1 hr 30 min",
+    distance_arrival: "10 ",
+    duration_arrival: "1 hr 30 ",
+    distance_back: "8 ",
+    duration_back: "0 hr 45 ",
     userId: "3",
   },
   {
@@ -52,8 +60,10 @@ const orders: Orders[] = [
     carModel: "BMW X5",
     origin: "Chacao, La Castellana",
     destination: "Baruta, La Trinidad",
-    distance: "10 km",
-    duration: "1 hr 30 min",
+    distance_arrival: "10 ",
+    duration_arrival: "1 hr 30 ",
+    distance_back: "8 ",
+    duration_back: "0 hr 45 ",
     userId: "3",
   },
   {
@@ -62,8 +72,10 @@ const orders: Orders[] = [
     carModel: "BMW X5",
     origin: "Chacao, La Castellana",
     destination: "Baruta, La Trinidad",
-    distance: "10 km",
-    duration: "1 hr 30 min",
+    distance_arrival: "10 ",
+    duration_arrival: "1 hr 30 ",
+    distance_back: "8 ",
+    duration_back: "0 hr 45 ",
     userId: "3",
   },
 ];

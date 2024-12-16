@@ -36,7 +36,7 @@ export default function DestinyScreen() {
       {/* Footer */}
       <View style={styles.footer}>
         <TouchableOpacity onPress={handlePerformService} style={[styles.button, styles.primaryButton]}>
-          <Text style={styles.buttonText}>Realizar servicio</Text>
+          <Text style={styles.buttonText}>He finalizado el servicio</Text>
         </TouchableOpacity>
       </View>
     </View>
