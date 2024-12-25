@@ -80,6 +80,72 @@ const orders: Orders[] = [
   },
 ];
 
+
+
+const completedOrderss: Orders[] = [
+  {
+    orderId: "1",
+    driverName: "Carlos Sousa",
+    carModel: "BMW X5",
+    origin: "Chacao, La Castellana",
+    destination: "Baruta, La Trinidad",
+    distance_arrival: "10 ",
+    duration_arrival: "1 hr 30",
+    distance_back: "8 ",
+    duration_back: "0 hr 45",
+    userId: "1",
+  },
+  {
+    orderId: "3",
+    driverName: "Enrique Gonzalez",
+    carModel: "Chevrolet Grand Vitara",
+    origin: "Chacao, La Castellana",
+    destination: "Baruta, La Trinidad",
+    distance_arrival: "10 ",
+    duration_arrival: "1 hr 30 ",
+    distance_back: "8 ",
+    duration_back: "0 hr 45 ",
+    userId: "1",
+  },
+  {
+    orderId: "4",
+    driverName: "Andrea Cedeño",
+    carModel: "BMW X5",
+    origin: "Chacao, La Castellana",
+    destination: "Baruta, La Trinidad",
+    distance_arrival: "10 ",
+    duration_arrival: "1 hr 30 ",
+    distance_back: "8 ",
+    duration_back: "0 hr 45 ",
+    userId: "3",
+  },
+  {
+    orderId: "5",
+    driverName: "Juan Hedderich",
+    carModel: "BMW X5",
+    origin: "Chacao, La Castellana",
+    destination: "Baruta, La Trinidad",
+    distance_arrival: "10 ",
+    duration_arrival: "1 hr 30 ",
+    distance_back: "8 ",
+    duration_back: "0 hr 45 ",
+    userId: "3",
+  },
+  {
+    orderId: "6",
+    driverName: "Pedro Rodríguez",
+    carModel: "BMW X5",
+    origin: "Chacao, La Castellana",
+    destination: "Baruta, La Trinidad",
+    distance_arrival: "10 ",
+    duration_arrival: "1 hr 30 ",
+    distance_back: "8 ",
+    duration_back: "0 hr 45 ",
+    userId: "3",
+  },
+];
+
+
 const additionalCosts: AdditionalCost[] = [
   {
     costId: "101",
@@ -109,5 +175,5 @@ const additionalCosts: AdditionalCost[] = [
   
 ];
 
-export { orders, additionalCosts };
-export default { orders, additionalCosts };
+export { orders, additionalCosts, completedOrderss };
+export default { orders, additionalCosts, completedOrderss };

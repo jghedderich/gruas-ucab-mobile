@@ -1,52 +1,74 @@
 import { StyleSheet, ScrollView } from 'react-native';
-
 import { ThemedText } from '@/components/ThemedText';
 import OrderCard from '@/components/orders/OrderCard';
-import Tabs from '@/components/common/Navbar';
+import { useUser } from '@/app/context/UserContext'; // Importamos el contexto de usuario
+import  { completedOrderss }  from '@/app/data/data'; 
+import CompletedOrderCard from '@/components/orders/CompletedOrderCard';
+
+interface Order {
+  orderId: string;
+  driverName: string;
+  carModel: string;
+  origin: string;
+  destination: string;
+  distance_arrival: string;
+  duration_arrival: string;
+  distance_back: string;
+  duration_back: string;
+  userId: string;
+}
 
 export default function OrderScreen() {
+  const { user } = useUser(); // Obtenemos el usuario logueado del contexto
+
+  // Si no hay usuario logueado, mostramos un mensaje
+  if (!user) {
+    return (
+      <ScrollView style={styles.mainContainer}>
+        <ThemedText type="title" style={styles.title}>
+          No estás autenticado
+        </ThemedText>
+        <ThemedText type="default" style={styles.description}>
+          Por favor, inicia sesión para ver tus órdenes.
+        </ThemedText>
+      </ScrollView>
+    );
+  }
+
+  // Filtrar órdenes según el ID del usuario autenticado
+  const userOrders: Order[] = completedOrderss.filter(order => order.userId === user.id);
+
   return (
     <ScrollView style={styles.mainContainer}>
       <ThemedText type="title" style={styles.title}>
-        Lista de órdenes
+        Órdenes completadas
       </ThemedText>
-      <ThemedText type="default" style={styles.description}>
-        Revisa todas las órdenes han sido asignadas a tu flota.
-      </ThemedText>
-      <OrderCard
-        driverName="Carlos Sousa"
-        carModel="BMW X5"
-        origin="Chacao, La Castellana"
-        destination="Baruta, La Trinidad"
-        distance="10 km"
-        duration="1 hr 30 min"
-        id={'1'}
-      />
-      <OrderCard
-        driverName="Enrique Gonzalez"
-        carModel="Chevrolet Grand Vitara"
-        origin="Chacao, La Castellana"
-        destination="Baruta, La Trinidad"
-        distance="10 km"
-        duration="1 hr 30 min"
-        id={'2'}
-      />
-      <OrderCard
-        driverName="Carlos Sousa"
-        carModel="BMW X5"
-        origin="Chacao, La Castellana"
-        destination="Baruta, La Trinidad"
-        distance="10 km"
-        duration="1 hr 30 min"
-        id={'3'}
-      />
+
+      {userOrders.length > 0 ? (
+        userOrders.map((order) => (
+          <CompletedOrderCard
+            key={order.orderId} 
+            orderId={order.orderId}
+            driverName={order.driverName}
+            carModel={order.carModel}
+            origin={order.origin}
+            destination={order.destination}
+            distance_arrival={order.distance_arrival}
+            duration_arrival={order.duration_arrival}
+            distance_back={order.distance_back}
+            duration_back={order.duration_back}
+            userId={order.userId}
+          />
+        ))
+      ) : (
+        <ThemedText type="default" style={styles.description}>
+          No has realizado aún ningún servicio.
+        </ThemedText>
+      )}
       <ThemedText type="default" style={styles.footer}>
         Creado y diseñado por el Equipo Nro. 9
-      </ThemedText>     
-      
-     
+      </ThemedText>
     </ScrollView>
-  
   );
 }
 
@@ -56,17 +78,6 @@ const styles = StyleSheet.create({
   },
   title: {
     marginTop: 54,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
   },
   description: {
     color: 'gray',
@@ -80,15 +91,3 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
-
-// // app/order.tsx
-// import React from 'react';
-// import { View, Text } from 'react-native';
-
-// export default function OrderScreen() {
-//   return (
-//     <View>
-//       <Text>Orden</Text>
-//     </View>
-//   );
-// }
