@@ -1,18 +1,28 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 // Define la estructura del usuario
+interface Name {
+    firstName: string;
+    lastName: string;
+}
+
+interface Dni {
+    type: string;
+    number: string;
+}
+
 interface User {
-  id: string;
-  name: string;
-  email: string;
-  user: string;
-  password: string;
-  company: string;
-  truck: string;
-  placa: string;
-  dni: string;
-  phone: string;
-  status: string;
+    id: string;
+    vehicleId: string;
+    providerId: string;
+    name: Name;
+    dni: Dni;
+    phone: string;
+    email: string;
+    password: string;
+    status: string;
+    location: string | null;
+    isActive: boolean;
 }
 
 interface UserContextType {

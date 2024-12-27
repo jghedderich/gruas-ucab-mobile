@@ -6,7 +6,7 @@ import { Link } from 'expo-router';
 
 interface OrderCardProps {
   orderId: string;
-  driverName: string;
+  clientName: string;
   carModel: string;
   origin: string;
   destination: string;
@@ -19,7 +19,7 @@ interface OrderCardProps {
 
 export default function OrderCard({
   orderId,
-  driverName,
+  clientName,
   carModel,
   origin,
   destination,
@@ -41,7 +41,7 @@ export default function OrderCard({
       <TouchableOpacity onPress={handlePress} style={styles.card} activeOpacity={0.8}>
         <View style={styles.header}>
           <View>
-            <Text style={styles.driverName}>{driverName}</Text>
+                      <Text style={styles.clientName}>{clientName}</Text>
             <View style={styles.carInfo}>
               <Ionicons name="car-outline" size={16} color="#666" />
               <Text style={styles.carModel}>{carModel}</Text>
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
-  driverName: {
+  clientName: {
     fontSize: 18,
     fontWeight: 'bold',
   },
