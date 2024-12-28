@@ -1,118 +1,150 @@
-import { Section } from '@/components/common/Section';
-import CompletedOrderCard from '@/components/orders/CompletedOrderCard';
-import { InfoItem } from '@/components/profile/InfoItem';
+import React, { useEffect, useState, useCallback } from 'react';
+import { ScrollView, Text, StyleSheet, View, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useUser } from '@/app/context/UserContext';
-import { Link, useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { Image } from 'react-native';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useProfile } from '@/app/context/ProfileContext'; // Importa el hook
+import { useUser } from '@/app/context/UserContext'; // Contexto de usuario
+import { useFocusEffect } from '@react-navigation/native';
+import config from '@/app/config';
 
 export default function DriverProfileScreen() {
-  const { user, setUser } = useUser(); // Obtenemos el usuario logueado del contexto
-  const router = useRouter();
-  const [currentStatus, setCurrentStatus] = useState<string>(
-    user?.status || 'available'
-  );
+    const apiUrl = config.apiBaseUrl;
+    const { user, setUser } = useUser();
+    const router = useRouter();
+    const statusColors: Record<string, string> = {
+        Available: '#4CAF50',
+        Unavailable: '#F44336',
+    };
 
-  const statusColors: Record<string, string> = {
-    available: '#4CAF50',
-    unavailable: '#F44336',
-    busy: '#FFC107',
-  };
+    // Estado inicial
+    const [currentStatus, setCurrentStatus] = useState<string>(user?.status || 'Available');
+    const { provider, vehicle } = useProfile(); // Accede a los datos del provider y vehicle
 
-  // función para actualizar el estado del gruero
-  const toggleStatus = () => {
-    const statusOrder: string[] = ['available', 'unavailable', 'busy'];
-    const currentIndex = statusOrder.indexOf(currentStatus);
-    const nextIndex = (currentIndex + 1) % statusOrder.length;
-    setCurrentStatus(statusOrder[nextIndex]);
-    // Aquí está donde se guarda la actualización del estado
-    console.log('Nuevo estado:', statusOrder[nextIndex]);
-  };
 
-  const handleLogout = () => {
-    setUser(null); // Borro el usuario del contexto
-    router.push('/login'); // Vamos al login
-  };
+    const toggleStatus = async () => {
+        const statusOrder: string[] = ['Available', 'Unavailable'];
+        const currentIndex = statusOrder.indexOf(currentStatus);
+        const nextIndex = (currentIndex + 1) % statusOrder.length;
+        const newStatus = statusOrder[nextIndex];
 
-  return (
-    <ScrollView style={styles.container}>
-      {/* Encabezado con el botón de cierre de sesión */}
-      <View style={styles.header}>
-        <Image 
-          source={require('@/assets/images/Gruas_profile.jpg')}
-          style={styles.profileImage} 
-        />
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={30} color="#666" />
-        </TouchableOpacity>
-      </View>
+        // Actualizamos el estado localmente
+        setCurrentStatus(newStatus);
+        console.log('Nuevo estado:', newStatus);
 
-      {/* Información del Usuario */}
-      <View style={styles.section}>
-        <Text style={styles.name}>{user?.name || 'Sin Nombre'}</Text>
-        <Text style={styles.subtitle}>{user?.company || 'Sin Compañía'}</Text>
-        <View style={styles.statusContainer}>
-          <TouchableOpacity
-            style={[styles.statusBadge, { backgroundColor: statusColors[currentStatus] || '#666' }]}
-            onPress={toggleStatus}
-          >
-            <Text style={styles.statusText}>{currentStatus}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.editButton} 
-            onPress={() => router.push('/account/EditProfile')}
-          >
-            <Ionicons name="pencil" size={16} color="#fff" />
-            <Text style={styles.editText}>Editar Perfil</Text>
-          </TouchableOpacity>
+        // Hacer la solicitud PUT al backend para actualizar el estado
+        try {
+            const response = await fetch(`${apiUrl}/providers-service/drivers/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+            },
+        body: JSON.stringify({
+            driver: {
+                id: user?.id,
+                status: newStatus,
+            },
+        }),
+        });
 
-        </View>
-      </View>
+    const data = await response.json();
 
-      {/* Información Adicional */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Información Adicional</Text>
-        <View style={styles.infoContainer}>
-          <View style={styles.infoRow}>
-            <Ionicons name="car" size={28} color="#444444" style={styles.infoIcon} />
-            <Text style={styles.infoText}>
-              {user?.truck || 'Sin vehículo'}
-            </Text>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.infoRow}>
-            <Ionicons name="mail" size={28} color="#444444" style={styles.infoIcon} />
-            <Text style={styles.infoText}>
-              {user?.email || 'Sin correo'}
-            </Text>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.infoRow}>
-            <Ionicons name="id-card" size={28} color="#444444" style={styles.infoIcon} />
-            <Text style={styles.infoText}>
-              {user?.dni || 'Sin DNI'}
-            </Text>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.infoRow}>
-            <Ionicons name="call" size={28} color="#444444" style={styles.infoIcon} />
-            <Text style={styles.infoText}>
-              {user?.phone || 'Sin Teléfono'}
-            </Text>
-          </View>
-        </View>
-      </View>
-    </ScrollView>
-  );
+    if (response.ok) {
+        console.log('Estado actualizado correctamente en la base de datos');
+    } else {
+        console.error('Error al actualizar el estado del conductor:', data);
+        // Restaurar el estado anterior en caso de error
+        setCurrentStatus(currentStatus);
+    }
+} catch (error) {
+    console.error('Error de red al intentar actualizar el estado:', error);
+    // Restaurar el estado anterior en caso de error
+    setCurrentStatus(currentStatus);
 }
+};
+
+
+    const handleLogout = () => {
+        setUser(null);
+        router.push('/login');
+    };
+
+
+    // Este hook se ejecuta cada vez que la pantalla recibe el foco
+    //useFocusEffect(
+       // useCallback(() => {
+            // Actualizamos el estado de currentStatus y el usuario completo con el valor más reciente
+           // setCurrentStatus(user?.status || 'Available');
+           // setUser(user);
+        //}, [user]) // Dependencias para ejecutar solo cuando el estado del usuario cambie
+   // );
+
+
+    return (
+        <ScrollView style={styles.container}>
+            <View style={styles.header}>
+                <Image source={require('@/assets/images/Gruas_profile.jpg')} style={styles.profileImage} />
+                <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                    <Ionicons name="log-out-outline" size={30} color="#666" />
+                </TouchableOpacity>
+            </View>
+
+            <View style={styles.section}>
+                <Text style={styles.name}>{user?.name.firstName + ' ' + user?.name.lastName || 'Sin Nombre'}</Text>
+                <Text style={styles.subtitle}>{provider?.company.name || 'Sin compañía'}</Text>
+                <View style={styles.statusContainer}>
+                    <TouchableOpacity
+                        style={[styles.statusBadge, { backgroundColor: statusColors[currentStatus] || '#666' }]}
+                        onPress={toggleStatus}
+                    >
+                        <Text style={styles.statusText}>{currentStatus}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.editButton}
+                        onPress={() => router.push('/account/EditProfile')}
+                    >
+                        <Ionicons name="pencil" size={16} color="#fff" />
+                        <Text style={styles.editText}>Editar Perfil</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+
+            {/* Información Adicional */}
+            <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Información Adicional</Text>
+                <View style={styles.infoContainer}>
+                    <View style={styles.infoRow}>
+                        <Ionicons name="car" size={28} color="#444444" style={styles.infoIcon} />
+                        <Text style={styles.infoText}>
+                            {vehicle?.brand + ' ' + vehicle?.model || 'Sin vehículo'}
+                        </Text>
+                    </View>
+                    <View style={styles.divider} />
+                    <View style={styles.infoRow}>
+                        <Ionicons name="mail" size={28} color="#444444" style={styles.infoIcon} />
+                        <Text style={styles.infoText}>
+                            {user?.email || 'Sin correo'}
+                        </Text>
+                    </View>
+                    <View style={styles.divider} />
+                    <View style={styles.infoRow}>
+                        <Ionicons name="id-card" size={28} color="#444444" style={styles.infoIcon} />
+                        <Text style={styles.infoText}>
+                            {user?.dni.type + '-' + user?.dni.number || 'Sin DNI'}
+                        </Text>
+                    </View>
+                    <View style={styles.divider} />
+                    <View style={styles.infoRow}>
+                        <Ionicons name="call" size={28} color="#444444" style={styles.infoIcon} />
+                        <Text style={styles.infoText}>
+                            {user?.phone || 'Sin Teléfono'}
+                        </Text>
+                    </View>
+                </View>
+            </View>
+        </ScrollView>
+    );
+}
+
 
 const styles = StyleSheet.create({
   container: {
@@ -217,5 +249,10 @@ const styles = StyleSheet.create({
     width: 80, 
     height: 80, 
     borderRadius: 40, 
-  },
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });

@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { StyleSheet, TextInput, Button, View, Alert } from 'react-native';
 import { useUser } from '@/app/context/UserContext';
+import config from './config';
 
 export default function LoginScreen() {
+    const apiUrl = config.apiBaseUrl;
     const router = useRouter();
     const { setUser } = useUser();
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -15,7 +16,7 @@ export default function LoginScreen() {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://192.168.18.211:6004/providers-service/drivers/authenticate', {
+            const response = await fetch(`${apiUrl}/providers-service/drivers/authenticate`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
