@@ -4,6 +4,7 @@ import { ThemedText } from '@/components/ThemedText';
 import OrderCard from '@/components/orders/OrderCard';
 import { useUser } from '@/app/context/UserContext'; // Importamos el contexto de usuario
 import { useFocusEffect } from '@react-navigation/native';
+import config from '@/app/config';
 
 interface Coordinates {
     latitude: string;
@@ -54,6 +55,7 @@ interface Order {
 }
 
 export default function OrderScreen() {
+    const apiUrl = config.apiBaseUrl;
     const { user } = useUser(); // Obtenemos el usuario logueado del contexto
     const [orders, setOrders] = useState<Order[]>([]); // Estado para almacenar las órdenes
     const [loading, setLoading] = useState(true); // Estado para manejar la carga
@@ -66,7 +68,7 @@ export default function OrderScreen() {
         }
 
         try {
-            const response = await fetch('http://192.168.18.211:6004/orders-service/orders'); // Cambia <TU_BACKEND_URL> por tu URL
+            const response = await fetch(`${apiUrl}/orders-service/orders`); // Cambia <TU_BACKEND_URL> por tu URL
             const data = await response.json();
 
             // Filtrar las órdenes por driverId

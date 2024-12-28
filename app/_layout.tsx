@@ -10,6 +10,7 @@ import { UserProvider } from '@/app/context/UserContext';
 import { OrderProvider } from '@/app/context/OrderContext'; 
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { ProfileProvider } from '@/app/context/ProfileContext'; 
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -34,7 +35,8 @@ export default function RootLayout() {
   }
 
   return (
-    <UserProvider>
+      <UserProvider>
+      <ProfileProvider>
       <OrderProvider>
         <SafeAreaProvider>
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
@@ -44,7 +46,8 @@ export default function RootLayout() {
             </Stack>
           </ThemeProvider>
         </SafeAreaProvider>
-      </OrderProvider>
+              </OrderProvider>
+          </ProfileProvider>
     </UserProvider>
   );
 }
