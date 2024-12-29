@@ -2,9 +2,11 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { StyleSheet, ScrollView, ActivityIndicator, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import OrderCard from '@/components/orders/OrderCard';
-import { useUser } from '@/app/context/UserContext'; // Importamos el contexto de usuario
+import { useUser } from '@/app/context/UserContext';
 import { useFocusEffect } from '@react-navigation/native';
 import config from '@/app/config';
+import { useOrder } from '@/app/context/OrderContext';
+import { calculateDistanceAndDuration } from '@/components/orders/DistanceCalculator';
 
 interface Coordinates {
     latitude: string;
@@ -50,14 +52,16 @@ interface Order {
     orderStatus: string;
     incidentAddress: Address;
     destinationAddress: Address;
-    costDetails: any[]; // Puedes definir una interfaz específica si conoces la estructura de costDetails
+    costDetails: any[];
     isActive: boolean;
+    distanceArrival?: string;
+    durationArrival?: string;
 }
 
 export default function OrderScreen() {
     const apiUrl = config.apiBaseUrl;
     const { user } = useUser(); // Obtenemos el usuario logueado del contexto
-    const [orders, setOrders] = useState<Order[]>([]); // Estado para almacenar las órdenes
+    const {orders, setOrders} = useOrder(); // Estado para almacenar las órdenes
     const [loading, setLoading] = useState(true); // Estado para manejar la carga
     const [error, setError] = useState<string | null>(null); // Estado para manejar errores
 
@@ -68,12 +72,33 @@ export default function OrderScreen() {
         }
 
         try {
-            const response = await fetch(`${apiUrl}/orders-service/orders`); // Cambia <TU_BACKEND_URL> por tu URL
+            const response = await fetch(`${apiUrl}/orders-service/orders`);
             const data = await response.json();
-
-            // Filtrar las órdenes por driverId
-            const userOrders = data.orders.data.filter((order: Order) => order.driverId === user.id);
+            const userOrders1 = data.orders.data.filter((order: Order) => order.orderStatus != 'Completed');
+            const userOrders2 = userOrders1.filter((order: Order) =>  order.orderStatus != 'Canceled');
+            const userOrders = userOrders2.filter((order: Order) => order.driverId === user.id);
             setOrders(userOrders);
+            // Calcular distancia y duración para cada orden
+            //const updatedOrders = await Promise.all(
+            //    userOrders.map(async (order: Order) => {
+            //        const originCoords = [
+            //            parseFloat(order.incidentAddress.coordinates.longitude),
+            //            parseFloat(order.incidentAddress.coordinates.latitude),
+            //        ];
+            //        const destinationCoords = [
+            //            parseFloat(order.destinationAddress.coordinates.longitude),
+            //            parseFloat(order.destinationAddress.coordinates.latitude),
+            //        ];
+            //        console.log(originCoords, destinationCoords);
+            //        const { distance, duration } = await calculateDistanceAndDuration(originCoords, destinationCoords);
+            //        console.log(distance, duration);
+            //        return {
+            //            ...order,
+            //            distanceArrival: distance ?? 'N/A',
+            //            durationArrival: duration ?? 'N/A',
+            //        };
+            //    })
+            //);
         } catch (err) {
             console.error('Error fetching orders:', err);
             setError('Error fetching orders');
@@ -141,20 +166,20 @@ export default function OrderScreen() {
                         key={order.id}
                         orderId={order.id}
                         clientName={`${order.client.name.firstName} ${order.client.name.lastName}`}
-                        carModel={order.client.clientVehicle.model}
-                        origin={`${order.incidentAddress.addressLine1}, ${order.incidentAddress.city}`}
-                        destination={`${order.destinationAddress.addressLine1}, ${order.destinationAddress.city}`}
-                        distance_arrival="N/A" // Cambia si tienes este dato
-                        duration_arrival="N/A" // Cambia si tienes este dato
-                        distance_back="N/A" // Cambia si tienes este dato
-                        duration_back="N/A" // Cambia si tienes este dato
-                        userId={user.id}
+                        carModel={order.client.clientVehicle.brand + ' ' + order.client.clientVehicle.model}
+            origin={`${order.incidentAddress.addressLine1}, ${order.incidentAddress.city}`}
+            destination={`${order.destinationAddress.addressLine1}, ${order.destinationAddress.city}`}
+            distance_arrival="N/A"
+            duration_arrival="N/A"
+            distance_back="N/A" // Cambia si tienes este dato
+            duration_back="N/A" // Cambia si tienes este dato
+            userId={user.id}
                     />
-                ))
+            ))
             ) : (
-                <ThemedText type="default" style={styles.description}>
-                    No tienes órdenes asignadas.
-                </ThemedText>
+            <ThemedText type="default" style={styles.description}>
+                No tienes órdenes asignadas.
+            </ThemedText>
             )}
             <ThemedText type="default" style={styles.footer}>
                 Creado y diseñado por el Equipo Nro. 9
@@ -162,6 +187,7 @@ export default function OrderScreen() {
         </ScrollView>
     );
 }
+
 
 const styles = StyleSheet.create({
     mainContainer: {

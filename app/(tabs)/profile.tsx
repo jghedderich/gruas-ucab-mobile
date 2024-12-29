@@ -16,10 +16,8 @@ export default function DriverProfileScreen() {
         Unavailable: '#F44336',
     };
 
-    // Estado inicial
     const [currentStatus, setCurrentStatus] = useState<string>(user?.status || 'Available');
-    const { provider, vehicle } = useProfile(); // Accede a los datos del provider y vehicle
-
+    const { provider, vehicle } = useProfile();
 
     const toggleStatus = async () => {
         const statusOrder: string[] = ['Available', 'Unavailable'];
@@ -27,57 +25,57 @@ export default function DriverProfileScreen() {
         const nextIndex = (currentIndex + 1) % statusOrder.length;
         const newStatus = statusOrder[nextIndex];
 
-        // Actualizamos el estado localmente
         setCurrentStatus(newStatus);
-        console.log('Nuevo estado:', newStatus);
 
-        // Hacer la solicitud PUT al backend para actualizar el estado
         try {
             const response = await fetch(`${apiUrl}/providers-service/drivers/status`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-            },
-        body: JSON.stringify({
-            driver: {
-                id: user?.id,
-                status: newStatus,
-            },
-        }),
-        });
+                },
+                body: JSON.stringify({
+                    driver: {
+                        id: user?.id,
+                        status: newStatus,
+                    },
+                }),
+            });
 
-    const data = await response.json();
+            const data = await response.json();
 
-    if (response.ok) {
-        console.log('Estado actualizado correctamente en la base de datos');
-    } else {
-        console.error('Error al actualizar el estado del conductor:', data);
-        // Restaurar el estado anterior en caso de error
-        setCurrentStatus(currentStatus);
-    }
-} catch (error) {
-    console.error('Error de red al intentar actualizar el estado:', error);
-    // Restaurar el estado anterior en caso de error
-    setCurrentStatus(currentStatus);
-}
-};
-
+            if (!response.ok) {
+                console.error('Error al actualizar el estado del conductor:', data);
+                setCurrentStatus(currentStatus);
+            }
+        } catch (error) {
+            console.error('Error de red al intentar actualizar el estado:', error);
+            setCurrentStatus(currentStatus);
+        }
+    };
 
     const handleLogout = () => {
         setUser(null);
         router.push('/login');
     };
 
+    const fetchDriverData = async () => {
+        // Cada vez que vuelva el foco volvemos a pedir el conductor para ver si algo cambio!
+        try {
+            const driverResponse = await fetch(
+                `${apiUrl}/providers-service/drivers/${user?.id}`
+            );
+            const driverData = await driverResponse.json();
+            setUser(driverData.driver);
+        } catch (error) {
+            console.error('Error de red al intentar encontrar el conductor:', error);
+        }
+    }
 
-    // Este hook se ejecuta cada vez que la pantalla recibe el foco
-    //useFocusEffect(
-       // useCallback(() => {
-            // Actualizamos el estado de currentStatus y el usuario completo con el valor más reciente
-           // setCurrentStatus(user?.status || 'Available');
-           // setUser(user);
-        //}, [user]) // Dependencias para ejecutar solo cuando el estado del usuario cambie
-   // );
-
+    useFocusEffect(
+        useCallback(() => {
+            fetchDriverData();         
+        }, [user]) // Dependencias
+    );
 
     return (
         <ScrollView style={styles.container}>
@@ -108,7 +106,6 @@ export default function DriverProfileScreen() {
                 </View>
             </View>
 
-            {/* Información Adicional */}
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Información Adicional</Text>
                 <View style={styles.infoContainer}>
@@ -144,8 +141,6 @@ export default function DriverProfileScreen() {
         </ScrollView>
     );
 }
-
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

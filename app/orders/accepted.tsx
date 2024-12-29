@@ -47,22 +47,22 @@ export default function AcceptedOrderScreen() {
           subtitle="Diríjase a la ubicación del cliente y confirme su identidad."
         >
           <View style={styles.container}>
-            <Ionicons name="person" size={16} color="#666" />
-            <ThemedText type="default">{order?.driverName || 'Nombre no disponible'}</ThemedText>
+                      <Ionicons name="person" size={16} color="#666" />
+                      <ThemedText type="default">{order?.client.name.firstName + ' ' + order?.client.name.lastName || 'Nombre no disponible'}</ThemedText>
           </View>
           <View style={styles.container}>
-            <Ionicons name="car" size={16} color="#666" />
-            <ThemedText type="default">{order.carModel}</ThemedText>
+                      <Ionicons name="car" size={16} color="#666" />
+                      <ThemedText type="default">{order?.client.clientVehicle.brand + ' ' + order?.client.clientVehicle.model}</ThemedText>
           </View>
           <View style={styles.container}>
-            <Ionicons name="call" size={16} color="#666" />
-            <ThemedText type="default">{order?.distance || 'Teléfono no disponible'}</ThemedText>
+                      <Ionicons name="call" size={16} color="#666" />
+                      <ThemedText type="default">{order?.client.phone || 'Teléfono no disponible'}</ThemedText>
           </View>
           <View style={styles.container}>
-            <Ionicons name="location" size={16} color="#666" />
-            <ThemedText type="default">{order.origin}</ThemedText>
-          </View>
-          <MapComponent latitude={0} longitude={0} />
+                      <Ionicons name="location" size={16} color="#666" />
+                      <ThemedText type="default">{order?.incidentAddress.addressLine1 + ', ' + order?.incidentAddress.addressLine2}</ThemedText>
+                  </View>
+                  <MapComponent latitude={Number(order?.incidentAddress.coordinates.latitude)} longitude={Number(order?.incidentAddress.coordinates.longitude)} />
         </Section>
       </View>
 
