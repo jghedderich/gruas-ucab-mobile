@@ -10,10 +10,10 @@ interface OrderCardProps {
   carModel: string;
   origin: string;
   destination: string;
-  distance_arrival: string;
-  duration_arrival: string;
-  distance_back: string;
-  duration_back: string;
+  distance_arrival: any;
+  duration_arrival: any;
+  distance_back?: string;
+  duration_back?: string;
   userId: string;
 }
 
