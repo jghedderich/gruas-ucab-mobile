@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { ScrollView, Text, StyleSheet, View, TouchableOpacity, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useProfile } from '@/app/context/ProfileContext'; // Importa el hook
 import { useUser } from '@/app/context/UserContext'; // Contexto de usuario
 import { useFocusEffect } from '@react-navigation/native';
 import config from '@/app/config';
 import { debounce } from 'lodash';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function DriverProfileScreen() {
     const apiUrl = config.apiBaseUrl;

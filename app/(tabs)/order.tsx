@@ -67,21 +67,9 @@ export default function OrderScreen() {
     const [loading, setLoading] = useState(true); // Estado para manejar la carga
     const [error, setError] = useState<string | null>(null); // Estado para manejar errores
 
-  // Si no hay usuario logueado, mostramos un mensaje
-  if (!user) {
-    return (
-      <ScrollView style={styles.mainContainer}>
-        <ThemedText type="title" style={styles.title}>
-          No estás autenticado
-        </ThemedText>
-        <ThemedText type="default" style={styles.description}>
-          Por favor, inicia sesión para ver tus órdenes.
-        </ThemedText>
-      </ScrollView>
-    );
-    }
 
     const fetchOrdersCompleted = debounce(async () => {
+        // Si no hay usuario logueado, mostramos un mensaje
         if (!user) {
             setLoading(false);
             return;
@@ -106,6 +94,20 @@ export default function OrderScreen() {
             return () => fetchOrdersCompleted.cancel();
         }, [])
     );
+
+    // Mostrar mensaje si no hay usuario logueado
+    if (!user) {
+        return (
+            <ScrollView style={styles.mainContainer}>
+                <ThemedText type="title" style={styles.title}>
+                    No estás autenticado
+                </ThemedText>
+                <ThemedText type="default" style={styles.description}>
+                    Por favor, inicia sesión para ver tus órdenes.
+                </ThemedText>
+            </ScrollView>
+        );
+    }
 
   return (
     <ScrollView style={styles.mainContainer}>

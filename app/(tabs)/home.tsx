@@ -67,6 +67,7 @@ export default function OrderScreen() {
     const [error, setError] = useState<string | null>(null); // Estado para manejar errores
     const fetchOrders = debounce(async () => {
         if (!user) {
+            console.log('No user');
             setLoading(false);
             return;
         }
