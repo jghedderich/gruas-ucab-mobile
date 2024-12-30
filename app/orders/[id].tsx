@@ -18,12 +18,12 @@ const updateOrderStatus = async (orderId: string, orderStatus: string) => {
     const requestBody = {
         order: {
             id: orderId,
-            orderStatus: orderStatus
+            status: orderStatus
         }
     };
 
     try {
-        const response = await fetch(`${apiUrl}/orders-service/orders/status`, {
+        const response = await fetch(`${apiUrl}/providers-service/drivers/order`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -31,9 +31,7 @@ const updateOrderStatus = async (orderId: string, orderStatus: string) => {
             body: JSON.stringify(requestBody)
         });
 
-        if (!response.ok) {
-            throw new Error('Failed to update order status');
-        }
+
 
         const data = await response.json();
         return data;
@@ -47,9 +45,7 @@ export default function ServiceRequestDetail() {
   const navigation = useNavigation();
     const { user } = useUser();
     const { orders, getOrderById, selectedOrderId, fetchOrders } = useOrder();
-    useEffect(() => {
-        fetchOrders();
-    }, []);
+
   if (!user) {
     return (
       <SafeAreaView style={styles.container}>
@@ -76,9 +72,11 @@ export default function ServiceRequestDetail() {
     // Función para manejar el rechazo de la orden
     const handleRejectOrder = async () => {
         try {
-            await updateOrderStatus(order.id, 'Canceled');
-            console.log('Orden rechazada', order.id);
-            navigation.goBack(); // Vuelve a la pantalla anterior
+            const respuesta = await updateOrderStatus(order.id, 'Canceled');
+            if (respuesta) {
+                console.log('Orden rechazada', order.id);
+                navigation.goBack(); // Vuelve a la pantalla anterior
+            }
         } catch (error) {
             console.error('Error rejecting order:', error);
         }
@@ -87,9 +85,11 @@ export default function ServiceRequestDetail() {
     // Función para manejar la aceptación de la orden
     const handleAcceptOrder = async () => {
         try {
-            await updateOrderStatus(order.id, 'Accepted');
-            console.log('Orden aceptada', order.id);
-            router.push('/orders/accepted');
+            const respuesta = await updateOrderStatus(order.id, 'Accepted');
+            if (respuesta) {
+                console.log('Orden aceptada', order.id);
+                router.push('/orders/accepted');
+            }
         } catch (error) {
             console.error('Error accepting order:', error);
         }

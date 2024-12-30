@@ -55,7 +55,7 @@ export default function AccountScreen() {
             return;
         }
 
-        if (nombre && apellido && dniType && dni && phoneNumber && currentPassword) {
+        if (nombre && apellido && dniType && dni && phoneNumber) {
             // Llamada a la API para actualizar los datos
             try {
                 const updateDriverPayload = {

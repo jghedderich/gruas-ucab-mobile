@@ -1,25 +1,71 @@
 import { StyleSheet, ScrollView } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
 import { ThemedText } from '@/components/ThemedText';
 import OrderCard from '@/components/orders/OrderCard';
 import { useUser } from '@/app/context/UserContext'; // Importamos el contexto de usuario
 import  { completedOrderss }  from '@/app/data/data'; 
 import CompletedOrderCard from '@/components/orders/CompletedOrderCard';
+import { debounce } from 'lodash';
+import config from '@/app/config';
+import { useOrder } from '@/app/context/OrderContext';
+import { useFocusEffect } from '@react-navigation/native';
+
+interface Coordinates {
+    latitude: string;
+    longitude: string;
+}
+
+interface Address {
+    addressLine1: string;
+    addressLine2: string;
+    city: string;
+    state: string;
+    zip: string;
+    coordinates: Coordinates;
+}
+
+interface ClientVehicle {
+    brand: string;
+    model: string;
+    year: number;
+    type: string;
+}
+
+interface Client {
+    name: {
+        firstName: string;
+        lastName: string;
+    };
+    dni: {
+        type: string;
+        number: string;
+    };
+    phone: string;
+    email: string;
+    clientVehicle: ClientVehicle;
+}
 
 interface Order {
-  orderId: string;
-  driverName: string;
-  carModel: string;
-  origin: string;
-  destination: string;
-  distance_arrival: string;
-  duration_arrival: string;
-  distance_back: string;
-  duration_back: string;
-  userId: string;
+    id: string;
+    operatorId: string;
+    policyId: string;
+    driverId: string;
+    client: Client;
+    orderStatus: string;
+    incidentAddress: Address;
+    destinationAddress: Address;
+    costDetails: any[];
+    isActive: boolean;
+    distanceArrival?: string;
+    durationArrival?: string;
 }
 
 export default function OrderScreen() {
-  const { user } = useUser(); // Obtenemos el usuario logueado del contexto
+    const apiUrl = config.apiBaseUrl;
+    const { user } = useUser(); // Obtenemos el usuario logueado del contexto
+    const { orders, setOrders, fetchOrders } = useOrder(); // Estado para almacenar las órdenes
+    const [loading, setLoading] = useState(true); // Estado para manejar la carga
+    const [error, setError] = useState<string | null>(null); // Estado para manejar errores
 
   // Si no hay usuario logueado, mostramos un mensaje
   if (!user) {
@@ -33,10 +79,33 @@ export default function OrderScreen() {
         </ThemedText>
       </ScrollView>
     );
-  }
+    }
 
-  // Filtrar órdenes según el ID del usuario autenticado
-  const userOrders: Order[] = completedOrderss.filter(order => order.userId === user.id);
+    const fetchOrdersCompleted = debounce(async () => {
+        if (!user) {
+            setLoading(false);
+            return;
+        }
+        try {
+            const response = await fetch(`${apiUrl}/orders-service/orders`);
+            const data = await response.json();
+            const userOrders1 = data.orders.data.filter((order: Order) => order.orderStatus === 'Completed');
+            const userOrders = userOrders1.filter((order: Order) => order.driverId === user.id);
+            setOrders(userOrders);
+        } catch (err) {
+            console.error('Error fetching orders home:', err);
+            setError('Error fetching orders');
+        } finally {
+            setLoading(false);
+        }
+    }, 350);
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchOrdersCompleted();
+            return () => fetchOrdersCompleted.cancel();
+        }, [])
+    );
 
   return (
     <ScrollView style={styles.mainContainer}>
@@ -44,20 +113,20 @@ export default function OrderScreen() {
         Órdenes completadas
       </ThemedText>
 
-      {userOrders.length > 0 ? (
-        userOrders.map((order) => (
+          {orders.length > 0 ? (
+              orders.map((order) => (
           <CompletedOrderCard
-            key={order.orderId} 
-            orderId={order.orderId}
-            driverName={order.driverName}
-            carModel={order.carModel}
-            origin={order.origin}
-            destination={order.destination}
-            distance_arrival={order.distance_arrival}
-            duration_arrival={order.duration_arrival}
-            distance_back={order.distance_back}
-            duration_back={order.duration_back}
-            userId={order.userId}
+            key={order.id} 
+                      orderId={order.id}
+                      driverName={order.client.name.firstName + ' ' + order.client.name.lastName}
+                      carModel={order.client.clientVehicle.brand + ' ' + order.client.clientVehicle.model}
+                      origin={order.incidentAddress.addressLine1 + ', ' + order.incidentAddress.addressLine2}
+                      destination={order.destinationAddress.addressLine1 + ', ' + order.destinationAddress.addressLine2}
+            distance_arrival={"N/A"}
+            duration_arrival={"N/A"}
+            distance_back={"N/A"}
+            duration_back={"N/A"}
+            userId={user.id}
           />
         ))
       ) : (

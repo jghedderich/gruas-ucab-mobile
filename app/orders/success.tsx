@@ -6,7 +6,7 @@ export default function SuccessScreen() {
   const handleButtonPress = () => {
     // Lógica para marcar la orden como completada
     console.log('Botón presionado. Ejecutando acción...');
-    router.push('/(tabs)/home')
+      router.push('/home'); // Navegar a la pantalla principal
   };
 
   return (

@@ -7,6 +7,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import config from '@/app/config';
 import { useOrder } from '@/app/context/OrderContext';
 import { calculateDistanceAndDuration } from '@/components/orders/DistanceCalculator';
+import { debounce } from 'lodash';
 
 interface Coordinates {
     latitude: string;
@@ -61,21 +62,19 @@ interface Order {
 export default function OrderScreen() {
     const apiUrl = config.apiBaseUrl;
     const { user } = useUser(); // Obtenemos el usuario logueado del contexto
-    const {orders, setOrders} = useOrder(); // Estado para almacenar las órdenes
+    const { orders, setOrders } = useOrder(); // Estado para almacenar las órdenes
     const [loading, setLoading] = useState(true); // Estado para manejar la carga
     const [error, setError] = useState<string | null>(null); // Estado para manejar errores
-
-    const fetchOrders = async () => {
+    const fetchOrders = debounce(async () => {
         if (!user) {
             setLoading(false);
             return;
         }
-
         try {
             const response = await fetch(`${apiUrl}/orders-service/orders`);
             const data = await response.json();
             const userOrders1 = data.orders.data.filter((order: Order) => order.orderStatus != 'Completed');
-            const userOrders2 = userOrders1.filter((order: Order) =>  order.orderStatus != 'Canceled');
+            const userOrders2 = userOrders1.filter((order: Order) => order.orderStatus != 'Canceled');
             const userOrders = userOrders2.filter((order: Order) => order.driverId === user.id);
             setOrders(userOrders);
             // Calcular distancia y duración para cada orden
@@ -100,17 +99,18 @@ export default function OrderScreen() {
             //    })
             //);
         } catch (err) {
-            console.error('Error fetching orders:', err);
+            console.error('Error fetching orders home:', err);
             setError('Error fetching orders');
         } finally {
             setLoading(false);
         }
-    };
+    }, 350);
 
     useFocusEffect(
         useCallback(() => {
             fetchOrders();
-        }, [user])
+            return () => fetchOrders.cancel();
+        }, [])
     );
 
     // Mostrar mensaje si no hay usuario logueado
@@ -137,19 +137,7 @@ export default function OrderScreen() {
         );
     }
 
-    // Mostrar mensaje de error si ocurre un problema
-    if (error) {
-        return (
-            <ScrollView style={styles.mainContainer}>
-                <ThemedText type="title" style={styles.title}>
-                    Error
-                </ThemedText>
-                <ThemedText type="default" style={styles.description}>
-                    {error}
-                </ThemedText>
-            </ScrollView>
-        );
-    }
+
 
     // Mostrar las órdenes filtradas
     return (

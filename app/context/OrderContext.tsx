@@ -77,12 +77,11 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
         if (user) {
             try {
                 const response = await fetch(`${apiUrl}/orders-service/orders`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch orders');
-                }
 
                 const data = await response.json();
-                const filteredOrders = data.orders.data.filter((order: Order) => order.driverId === user?.id);
+                const userOrders1 = data.orders.data.filter((order: Order) => order.orderStatus != 'Completed');
+                const userOrders2 = userOrders1.filter((order: Order) => order.orderStatus != 'Canceled');
+                const filteredOrders = userOrders2.filter((order: Order) => order.driverId === user?.id);
                 setOrdersState(filteredOrders);
             } catch (error) {
                 console.error('Error fetching orders:', error);

@@ -6,6 +6,7 @@ import { useProfile } from '@/app/context/ProfileContext'; // Importa el hook
 import { useUser } from '@/app/context/UserContext'; // Contexto de usuario
 import { useFocusEffect } from '@react-navigation/native';
 import config from '@/app/config';
+import { debounce } from 'lodash';
 
 export default function DriverProfileScreen() {
     const apiUrl = config.apiBaseUrl;
@@ -43,10 +44,6 @@ export default function DriverProfileScreen() {
 
             const data = await response.json();
 
-            if (!response.ok) {
-                console.error('Error al actualizar el estado del conductor:', data);
-                setCurrentStatus(currentStatus);
-            }
         } catch (error) {
             console.error('Error de red al intentar actualizar el estado:', error);
             setCurrentStatus(currentStatus);
@@ -58,7 +55,7 @@ export default function DriverProfileScreen() {
         router.push('/login');
     };
 
-    const fetchDriverData = async () => {
+    const fetchDriverData = debounce(async () => {
         // Cada vez que vuelva el foco volvemos a pedir el conductor para ver si algo cambio!
         try {
             const driverResponse = await fetch(
@@ -69,12 +66,12 @@ export default function DriverProfileScreen() {
         } catch (error) {
             console.error('Error de red al intentar encontrar el conductor:', error);
         }
-    }
+    }, 300);
 
     useFocusEffect(
         useCallback(() => {
             fetchDriverData();         
-        }, [user]) // Dependencias
+        }, []) // Dependencias
     );
 
     return (

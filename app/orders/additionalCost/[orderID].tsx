@@ -41,7 +41,7 @@ export default function ServiceRequestDetail() {
 
   const order = selectedOrderId ? getOrderById(selectedOrderId) : undefined;
 
-  if (!order || order.userId !== user.id) {
+    if (!order || order.driverId !== user.id) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
@@ -55,7 +55,7 @@ export default function ServiceRequestDetail() {
     );
   }
 
-  const additionalCosts = simulateGetAdditionalCosts(order.orderId);
+  const additionalCosts = simulateGetAdditionalCosts(order.id);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -69,7 +69,7 @@ export default function ServiceRequestDetail() {
 
         <View style={styles.contentContainer}>
           <Text style={styles.title}>Detalles de la solicitud</Text>
-          <Text style={styles.text}>ID de la Orden: {order.orderId}</Text>
+          <Text style={styles.text}>ID de la Orden: {order.id}</Text>
 
           <Text style={styles.sectionTitle}>Costos Adicionales</Text>
           {additionalCosts.length > 0 ? (
