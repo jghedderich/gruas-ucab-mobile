@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,8 @@ import {
   TextInput,
   StyleSheet,
   ScrollView,
-  Modal,
+    Modal,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -15,20 +16,49 @@ import { Section } from '@/components/common/Section';
 import { additionalCosts } from '@/app/data/data';
 import { LinkButton } from '@/components/common/LinkButton';
 import { useRouter } from 'expo-router';
+import { useOrder } from '@/app/context/OrderContext';  
+import config from '@/app/config';
 
+const createCostDetail = async (orderId: string, description: string, amount: number) => {
+    const apiUrl = config.apiBaseUrl; // Asegúrate de que config esté importado
+    const requestBody = {
+        costDetail: {
+            orderId: orderId,
+            description: description,
+            amount: amount
+        }
+    };
+
+    try {
+        const response = await fetch(`${apiUrl}/orders-service/costdetails`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        const data = await response.json();
+        console.log('Costo Adicional agregado con exito!');
+        return data;
+    } catch (error) {
+        console.error('Error creating cost detail:', error);
+        throw error;
+    }
+};
 export default function RequestCostsScreen() {
   const navigation = useNavigation();
   const router = useRouter();
   const [costs, setCosts] = useState<{ [key: string]: string }>({});
-  const [isModalVisible, setModalVisible] = useState(false);
-
+    const [isModalVisible, setModalVisible] = useState(false);
+    const { orders, getOrderById, selectedOrderId, fetchOrders } = useOrder();
+    const order = selectedOrderId ? getOrderById(selectedOrderId) : undefined;
   const handleInputChange = (costId: string, value: string) => {
     setCosts((prev) => ({
       ...prev,
       [costId]: value,
     }));
   };
-
   const handleOpenModal = () => {
     setModalVisible(true);
   };
@@ -37,15 +67,30 @@ export default function RequestCostsScreen() {
     setModalVisible(false);
   };
 
-  const handleSendRequest = () => {
-    // Verifica si no hay costos adicionales
-    if (enteredCosts.length === 0) {
-      router.push('/orders/destiny'); 
-    } else {
-      router.push('/orders/costs-status'); 
-    }
-    handleCloseModal();
-  };
+    const handleSendRequest = async () => {
+        if (!order || !order.id) {
+            return;
+        }
+        // Verifica si no hay costos adicionales
+        if (enteredCosts.length === 0) {
+            router.push('/orders/destiny');
+        } else {
+            for (let i = 0; i < enteredCosts.length; i++) {
+                try {
+                    const cost = enteredCosts[i];
+                    if (!cost.name || !cost.value) {
+                        continue;
+                    }
+                    await createCostDetail(order?.id, cost.name, parseFloat(cost.value));
+                } catch (error) {
+                    console.error('Error creating cost detail:', error);
+                }
+            }
+            fetchOrders();
+            router.push('/orders/costs-status');
+        }
+        handleCloseModal();
+    };
   
 
   const enteredCosts = Object.entries(costs)

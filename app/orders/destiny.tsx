@@ -1,17 +1,58 @@
 import { Section } from '@/components/common/Section';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity , Alert} from 'react-native';
 import MapComponent from '@/components/orders/MapComponent';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import config from '@/app/config';
+import { useOrder } from '@/app/context/OrderContext';
 
+const updateOrderStatus = async (orderId: string, orderStatus: string) => {
+    const apiUrl = config.apiBaseUrl; // Asegúrate de que config esté importado
+    const requestBody = {
+        order: {
+            id: orderId,
+            status: orderStatus
+        }
+    };
+
+    try {
+        const response = await fetch(`${apiUrl}/providers-service/drivers/order`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        throw error;
+    }
+};
 export default function DestinyScreen() {
   const navigation = useNavigation();
-  const router = useRouter();
-  const handlePerformService = () => {
-    // Aquí implementar lógica adicional
-    console.log('Usuario ha confirmado que ha realizado el servicio.');
-    router.push('/orders/success'); 
+    const router = useRouter();
+    const { orders, getOrderById, selectedOrderId, fetchOrders } = useOrder();
+    const order = selectedOrderId ? getOrderById(selectedOrderId) : undefined;
+    if (!order || !order.id) {
+        return;
+    }
+  const handlePerformService = async () => {
+      // Aquí implementar lógica adicional
+      try {
+          const respuesta = await updateOrderStatus(order.id, 'Completed');
+          if (respuesta) {
+              console.log('Conductor ha confirmado que ha realizado el servicio.');
+              router.push('/orders/success'); 
+          }
+      } catch (error) {
+          console.error('Error confirming order:', error);
+      }
+
   };
   return (
     <View style={styles.screen}>
@@ -28,8 +69,8 @@ export default function DestinyScreen() {
         <Section
           title="Realice el servicio"
           subtitle="Revise la dirección del destino en el mapa y consulte con el cliente para obtener más información."
-        >
-          <MapComponent latitude={10.0} longitude={10.0} />
+              >
+                  <MapComponent latitude={Number(order?.destinationAddress.coordinates.latitude)} longitude={Number(order?.destinationAddress.coordinates.longitude)} />
         </Section>
       </View>
 

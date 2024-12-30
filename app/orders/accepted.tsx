@@ -7,28 +7,61 @@ import { Section } from '@/components/common/Section';
 import { useRouter } from 'expo-router';
 import MapComponent from '@/components/orders/MapComponent';
 import { ThemedText } from '@/components/ThemedText';
+import config from '@/app/config';
 
+const updateOrderStatus = async (orderId: string, orderStatus: string) => {
+    const apiUrl = config.apiBaseUrl; // Asegúrate de que config esté importado
+    const requestBody = {
+        order: {
+            id: orderId,
+            status: orderStatus
+        }
+    };
+
+    try {
+        const response = await fetch(`${apiUrl}/providers-service/drivers/order`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        throw error;
+    }
+};
 export default function AcceptedOrderScreen() {
   const navigation = useNavigation();
   const router = useRouter();
   const { user } = useUser(); // Obtener el usuario actual
   const { selectedOrderId, getOrderById } = useOrder(); // Obtener el ID de la orden seleccionada y la función para consultar los datos
-  const order = getOrderById(selectedOrderId || ''); // Consultar la orden seleccionada
+    const order = selectedOrderId ? getOrderById(selectedOrderId) : undefined;
+    if (!order) {
+        return (
+            <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>No se encontró información de la orden seleccionada.</Text>
+            </View>
+        );
+    }
 
   // Función para manejar el evento de presionar el botón
-  const handleArrival = () => {
-    console.log('He llegado a la ubicación');
-    // Aquí puedes agregar la lógica que necesites más adelante
-    router.push('/orders/identified');
+  const handleArrival = async () => {
+      try {
+          const respuesta = await updateOrderStatus(order.id, 'Located');
+          if (respuesta) {
+              console.log('Cliente localizado', order?.id);
+              router.push('/orders/identified');
+          }
+      } catch (error) {
+          console.error('Error updating order:', error);
+      }
   };
 
-  if (!order) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>No se encontró información de la orden seleccionada.</Text>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.screen}>
