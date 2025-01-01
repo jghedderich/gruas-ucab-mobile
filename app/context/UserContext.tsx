@@ -5,7 +5,17 @@ interface Name {
     firstName: string;
     lastName: string;
 }
-
+interface Location {
+    address1: string;
+    address2: string;
+    city: string;
+    state: string;
+    zip: string;
+    coordinates: {
+        latitude: string;
+        longitude: string;
+    };
+}
 interface Dni {
     type: string;
     number: string;
@@ -21,7 +31,7 @@ interface User {
     email: string;
     password: string;
     status: string;
-    location: string | null;
+    location?: Location;
     isActive: boolean;
 }
 
