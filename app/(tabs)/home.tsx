@@ -55,8 +55,8 @@ interface Order {
     destinationAddress: Address;
     costDetails: any[];
     isActive: boolean;
-    distanceArrival?: string;
-    durationArrival?: string;
+    distanceBack?: string;
+    durationBack?: string;
 }
 
 export default function OrderScreen() {
@@ -77,28 +77,29 @@ export default function OrderScreen() {
             const userOrders1 = data.orders.data.filter((order: Order) => order.orderStatus != 'Completed');
             const userOrders2 = userOrders1.filter((order: Order) => order.orderStatus != 'Canceled');
             const userOrders = userOrders2.filter((order: Order) => order.driverId === user.id);
-            setOrders(userOrders);
+            //setOrders(userOrders);
             // Calcular distancia y duración para cada orden
-            //const updatedOrders = await Promise.all(
-            //    userOrders.map(async (order: Order) => {
-            //        const originCoords = [
-            //            parseFloat(order.incidentAddress.coordinates.longitude),
-            //            parseFloat(order.incidentAddress.coordinates.latitude),
-            //        ];
-            //        const destinationCoords = [
-            //            parseFloat(order.destinationAddress.coordinates.longitude),
-            //            parseFloat(order.destinationAddress.coordinates.latitude),
-            //        ];
-            //        console.log(originCoords, destinationCoords);
-            //        const { distance, duration } = await calculateDistanceAndDuration(originCoords, destinationCoords);
-            //        console.log(distance, duration);
-            //        return {
-            //            ...order,
-            //            distanceArrival: distance ?? 'N/A',
-            //            durationArrival: duration ?? 'N/A',
-            //        };
-            //    })
-            //);
+            const updatedOrders = await Promise.all(
+                userOrders.map(async (order: Order) => {
+                    const originCoords = [
+                        parseFloat(order.incidentAddress.coordinates.longitude),
+                        parseFloat(order.incidentAddress.coordinates.latitude),
+                    ];
+                    const destinationCoords = [
+                        parseFloat(order.destinationAddress.coordinates.longitude),
+                        parseFloat(order.destinationAddress.coordinates.latitude),
+                    ];
+                    const { distance, duration } = await calculateDistanceAndDuration(originCoords, destinationCoords);
+                    order.distanceBack = distance ?? 'N/A';
+                    order.durationBack = duration ?? 'N/A';
+                    return {
+                        ...order,
+                        distanceBack: distance ?? 'N/A',
+                        durationBack: duration ?? 'N/A',
+                    };
+                })
+            );
+            setOrders(updatedOrders);
         } catch (err) {
             console.error('Error fetching orders home:', err);
             setError('Error fetching orders');
@@ -156,12 +157,12 @@ export default function OrderScreen() {
                         orderId={order.id}
                         clientName={`${order.client.name.firstName} ${order.client.name.lastName}`}
                         carModel={order.client.clientVehicle.brand + ' ' + order.client.clientVehicle.model}
-            origin={`${order.incidentAddress.addressLine1}, ${order.incidentAddress.city}`}
-            destination={`${order.destinationAddress.addressLine1}, ${order.destinationAddress.city}`}
-            distance_arrival="N/A"
-            duration_arrival="N/A"
-            distance_back="N/A" // Cambia si tienes este dato
-            duration_back="N/A" // Cambia si tienes este dato
+                        origin={`${order.incidentAddress.addressLine1}, ${order.incidentAddress.city}`}
+                        destination={`${order.destinationAddress.addressLine1}, ${order.destinationAddress.city}`}
+                        distance_arrival=""
+                        duration_arrival=""
+                        distance_back={order.distanceBack} // Cambia si tienes este dato
+                        duration_back={order.durationBack} // Cambia si tienes este dato
             userId={user.id}
                     />
             ))

@@ -52,6 +52,8 @@ interface Order {
     destinationAddress: Address;
     costDetails: CostDetail[];
     isActive: boolean;
+    distanceBack?: string;
+    durationBack?: string;
 }
 
 interface OrderContextType {
