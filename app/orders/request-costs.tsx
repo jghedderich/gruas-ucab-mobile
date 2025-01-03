@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,8 +6,7 @@ import {
   TextInput,
   StyleSheet,
   ScrollView,
-    Modal,
-  Alert,
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -16,43 +14,49 @@ import { Section } from '@/components/common/Section';
 import { additionalCosts } from '@/app/data/data';
 import { LinkButton } from '@/components/common/LinkButton';
 import { useRouter } from 'expo-router';
-import { useOrder } from '@/app/context/OrderContext';  
+import { useOrder } from '@/app/context/OrderContext';
 import config from '@/app/config';
+import Footer from '@/components/common/Footer';
+import Header from '@/components/common/Header';
 
-const createCostDetail = async (orderId: string, description: string, amount: number) => {
-    const apiUrl = config.apiBaseUrl; // Asegúrate de que config esté importado
-    const requestBody = {
-        costDetail: {
-            orderId: orderId,
-            description: description,
-            amount: amount
-        }
-    };
+const createCostDetail = async (
+  orderId: string,
+  description: string,
+  amount: number
+) => {
+  const apiUrl = config.apiBaseUrl; // Asegúrate de que config esté importado
+  const requestBody = {
+    costDetail: {
+      orderId: orderId,
+      description: description,
+      amount: amount,
+    },
+  };
 
-    try {
-        const response = await fetch(`${apiUrl}/orders-service/costdetails`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        });
+  try {
+    const response = await fetch(`${apiUrl}/orders-service/costdetails`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
 
-        const data = await response.json();
-        console.log('Costo Adicional agregado con exito!');
-        return data;
-    } catch (error) {
-        console.error('Error creating cost detail:', error);
-        throw error;
-    }
+    const data = await response.json();
+    console.log('Costo Adicional agregado con exito!');
+    return data;
+  } catch (error) {
+    console.error('Error creating cost detail:', error);
+    throw error;
+  }
 };
 export default function RequestCostsScreen() {
   const navigation = useNavigation();
   const router = useRouter();
   const [costs, setCosts] = useState<{ [key: string]: string }>({});
-    const [isModalVisible, setModalVisible] = useState(false);
-    const { orders, getOrderById, selectedOrderId, fetchOrders } = useOrder();
-    const order = selectedOrderId ? getOrderById(selectedOrderId) : undefined;
+  const [isModalVisible, setModalVisible] = useState(false);
+  const { orders, getOrderById, selectedOrderId, fetchOrders } = useOrder();
+  const order = selectedOrderId ? getOrderById(selectedOrderId) : undefined;
   const handleInputChange = (costId: string, value: string) => {
     setCosts((prev) => ({
       ...prev,
@@ -67,49 +71,48 @@ export default function RequestCostsScreen() {
     setModalVisible(false);
   };
 
-    const handleSendRequest = async () => {
-        if (!order || !order.id) {
-            return;
+  const handleSendRequest = async () => {
+    if (!order || !order.id) {
+      return;
+    }
+    // Verifica si no hay costos adicionales
+    if (enteredCosts.length === 0) {
+      router.push('/orders/destiny');
+    } else {
+      for (let i = 0; i < enteredCosts.length; i++) {
+        try {
+          const cost = enteredCosts[i];
+          if (!cost.name || !cost.value) {
+            continue;
+          }
+          await createCostDetail(order?.id, cost.name, parseFloat(cost.value));
+        } catch (error) {
+          console.error('Error creating cost detail:', error);
         }
-        // Verifica si no hay costos adicionales
-        if (enteredCosts.length === 0) {
-            router.push('/orders/destiny');
-        } else {
-            for (let i = 0; i < enteredCosts.length; i++) {
-                try {
-                    const cost = enteredCosts[i];
-                    if (!cost.name || !cost.value) {
-                        continue;
-                    }
-                    await createCostDetail(order?.id, cost.name, parseFloat(cost.value));
-                } catch (error) {
-                    console.error('Error creating cost detail:', error);
-                }
-            }
-            fetchOrders();
-            router.push('/orders/costs-status');
-        }
-        handleCloseModal();
-    };
-  
+      }
+      fetchOrders();
+      router.push('/orders/costs-status');
+    }
+    handleCloseModal();
+  };
 
   const enteredCosts = Object.entries(costs)
     .filter(([_, value]) => value)
     .map(([key, value]) => {
-      const costName = additionalCosts.find((cost) => cost.costId === key)?.name;
+      const costName = additionalCosts.find(
+        (cost) => cost.costId === key
+      )?.name;
       return { name: costName, value };
     });
 
   return (
     <>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>Opciones del Servicio</Text>
-      </View>
+      <Header
+        title="Opciones del Servicio"
+        onBack={() => navigation.goBack()}
+      />
 
-      <ScrollView>
+      <ScrollView contentContainerStyle={styles.content}>
         <Section
           title="Agregar costos adicionales"
           subtitle="Reporte todos los costos adicionales requeridos para realizar el servicio. Estos deberán ser aprobados por el operador de cabina."
@@ -123,7 +126,9 @@ export default function RequestCostsScreen() {
                   placeholder="Monto extra"
                   keyboardType="numeric"
                   value={costs[cost.costId] || ''}
-                  onChangeText={(value) => handleInputChange(cost.costId, value)}
+                  onChangeText={(value) =>
+                    handleInputChange(cost.costId, value)
+                  }
                 />
               </View>
             ))}
@@ -131,18 +136,20 @@ export default function RequestCostsScreen() {
         </Section>
       </ScrollView>
 
-      <View style={styles.footer}>
+      <Footer>
         <TouchableOpacity onPress={handleOpenModal} style={styles.footerButton}>
           <Text style={styles.footerButtonText}>Enviar solicitud</Text>
         </TouchableOpacity>
-      </View>
+      </Footer>
 
       <Modal visible={isModalVisible} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             {enteredCosts.length > 0 ? (
               <>
-                <Text style={styles.modalTitle}>Resumen de costos adicionales</Text>
+                <Text style={styles.modalTitle}>
+                  Resumen de costos adicionales
+                </Text>
                 {enteredCosts.map((cost, index) => (
                   <View key={index} style={styles.modalRow}>
                     <Text style={styles.modalCostName}>{cost.name}</Text>
@@ -155,9 +162,17 @@ export default function RequestCostsScreen() {
 
                 {/* Total */}
                 <View style={styles.modalRow}>
-                  <Text style={[styles.modalCostName, styles.totalText]}>Total</Text>
+                  <Text style={[styles.modalCostName, styles.totalText]}>
+                    Total
+                  </Text>
                   <Text style={[styles.modalCostValue, styles.totalValue]}>
-                    ${enteredCosts.reduce((sum, cost) => sum + parseFloat(cost.value || '0'), 0).toFixed(2)}
+                    $
+                    {enteredCosts
+                      .reduce(
+                        (sum, cost) => sum + parseFloat(cost.value || '0'),
+                        0
+                      )
+                      .toFixed(2)}
                   </Text>
                 </View>
               </>
@@ -168,31 +183,29 @@ export default function RequestCostsScreen() {
             )}
 
             <View style={styles.modalButtons}>
-              <TouchableOpacity onPress={handleCloseModal} style={[styles.modalButton, styles.modalCloseButton]}>
+              <TouchableOpacity
+                onPress={handleCloseModal}
+                style={[styles.modalButton, styles.modalCloseButton]}
+              >
                 <Text style={styles.modalButtonText}>Cerrar</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={handleSendRequest} style={[styles.modalButton, styles.modalSendButton]}>
+              <TouchableOpacity
+                onPress={handleSendRequest}
+                style={[styles.modalButton, styles.modalSendButton]}
+              >
                 <Text style={styles.modalButtonText}>Enviar Solicitud</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
-
-
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#f5f5f5',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    marginTop: 60,
+  content: {
+    marginTop: 100,
   },
   divider: {
     height: 1,
@@ -240,17 +253,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     textAlign: 'right',
   },
-  footer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 16,
-    backgroundColor: '#f5f5f5',
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
-  },
-  
   sendButtonText: {
     color: '#fff',
     fontWeight: 'bold',
@@ -288,41 +290,39 @@ const styles = StyleSheet.create({
     color: '#007bff',
   },
   modalButtons: {
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 20,
   },
   modalButton: {
-    flex: 1, 
+    flex: 1,
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',
   },
   modalCloseButton: {
-    backgroundColor: 'red', 
-    marginRight: 10, 
+    backgroundColor: 'red',
+    marginRight: 10,
   },
   modalSendButton: {
-    backgroundColor: 'green', 
-    marginLeft: 10, 
+    backgroundColor: 'green',
+    marginLeft: 10,
   },
   modalButtonText: {
-    color: '#fff', 
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
-  
+
   footerButton: {
-    backgroundColor: '#007BFF', 
-    paddingVertical: 15, 
-    borderRadius: 10, 
-    alignItems: 'center', 
+    backgroundColor: '#007BFF',
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
   },
   footerButtonText: {
-    color: '#fff', 
-    fontSize: 18, 
-    fontWeight: 'bold', 
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
-
-
