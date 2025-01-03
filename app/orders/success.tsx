@@ -1,17 +1,16 @@
 import { View, Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import Footer from '@/components/common/Footer';
 
 export default function SuccessScreen() {
   const router = useRouter();
   const handleButtonPress = () => {
-    // Lógica para marcar la orden como completada
     console.log('Botón presionado. Ejecutando acción...');
-      router.push('/home'); // Navegar a la pantalla principal
+    router.push('/home'); // Navegar a la pantalla principal
   };
 
   return (
     <View style={styles.screen}>
-      {/* Cabecera: Título y Subtítulo */}
       <View style={styles.header}>
         <Text style={styles.title}>¡Buen trabajo!</Text>
         <Text style={styles.subtitle}>
@@ -27,12 +26,11 @@ export default function SuccessScreen() {
         />
       </View>
 
-      {/* Footer: Botón */}
-      <View style={styles.footer}>
+      <Footer>
         <TouchableOpacity style={styles.button} onPress={handleButtonPress}>
           <Text style={styles.buttonText}>Continuar</Text>
         </TouchableOpacity>
-      </View>
+      </Footer>
     </View>
   );
 }
@@ -68,12 +66,6 @@ const styles = StyleSheet.create({
   image: {
     width: 250,
     height: 250,
-  },
-  footer: {
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#ddd',
-    backgroundColor: '#fff',
   },
   button: {
     backgroundColor: '#007BFF',

@@ -1,8 +1,16 @@
 import { Section } from '@/components/common/Section';
-import { View, StyleSheet, Image, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import {
+  View,
+  StyleSheet,
+  Image,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
+import Header from '@/components/common/Header';
+import Footer from '@/components/common/Footer';
 
 export default function IdentifiedScreen() {
   const navigation = useNavigation();
@@ -21,51 +29,49 @@ export default function IdentifiedScreen() {
 
   return (
     <>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>Opciones del Servicio</Text>
-      </View>
+      <Header
+        title="Opciones del Servicio"
+        onBack={() => navigation.goBack()}
+      />
 
-      {/* Contenido principal */}
-      <Section
-        title="¿Desea agregar costos adicionales?"
-        subtitle="Puede solicitar costos adicionales o proceder a realizar el servicio. Estos deberán ser aprobados por el operador de cabina."
-        footer={
-          <View style={styles.buttonContainer}>
-            {/* Botón para solicitar costos */}
-            <TouchableOpacity onPress={handleRequestCosts} style={[styles.button, styles.outlinedButton]}>
-              <Text style={[styles.buttonText, styles.outlinedText]}>Solicitar costos</Text>
-            </TouchableOpacity>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Section
+          title="¿Desea agregar costos adicionales?"
+          subtitle="Puede solicitar costos adicionales o proceder a realizar el servicio. Estos deberán ser aprobados por el operador de cabina."
+        >
+          <Image
+            source={require('@/assets/images/negocio.png')}
+            style={styles.image}
+          />
+        </Section>
+        <Footer
+          style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+        >
+          <TouchableOpacity
+            onPress={handleRequestCosts}
+            style={[styles.button, styles.outlinedButton]}
+          >
+            <Text style={[styles.buttonText, styles.outlinedText]}>
+              Solicitar costos
+            </Text>
+          </TouchableOpacity>
 
-            {/* Botón para realizar el servicio */}
-            <TouchableOpacity onPress={handlePerformService} style={[styles.button, styles.primaryButton]}>
-              <Text style={styles.buttonText}>Realizar servicio</Text>
-            </TouchableOpacity>
-          </View>
-        }
-      >
-        <Image
-          source={require('@/assets/images/negocio.png')}
-          style={styles.image}
-        />
-      </Section>
+          <TouchableOpacity
+            onPress={handlePerformService}
+            style={[styles.button, styles.primaryButton]}
+          >
+            <Text style={styles.buttonText}>Realizar servicio</Text>
+          </TouchableOpacity>
+        </Footer>
+      </ScrollView>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#f9f9f9',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    marginTop: 60,
+  content: {
+    flex: 1,
+    marginTop: 100,
   },
   backButton: {
     marginRight: 8,
@@ -74,12 +80,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 16,
   },
   button: {
     paddingVertical: 12,
