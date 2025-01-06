@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "773576465708",
+    "project_id": "gruasucab-fd899",
+    "storage_bucket": "gruasucab-fd899.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:773576465708:android:108e6bb5060499533e2089",
+        "android_client_info": {
+          "package_name": "com.gruasucab.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtMMjAKnNAbc4nahS9hXHl50_ZAK_l_Ro"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

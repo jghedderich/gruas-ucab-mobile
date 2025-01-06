@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "gruas-ucab-mobile",
-    "slug": "gruas-ucab-mobile",
+    "slug": "gruasucabmobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -14,13 +14,21 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.gruasucab.mobile"
     },
     "android": {
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDj_dOUSZbejwr9PUbxTh29X8NTHgYoRUk"
+        }
+      },
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.gruasucab.mobile",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -33,6 +41,12 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "82829423-6c01-4813-b888-acfc8a9d361f"
+      }
+    },
+    "owner": "droski0802"
   }
 }
