@@ -53,6 +53,11 @@ export default function LoginScreen() {
         }
     };
 
+    const handleForgotPassword = () => {
+      router.push('/forgot-password'); // Navegar a la pantalla de recuperación de contraseña
+
+    };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Iniciar sesión</Text>
@@ -79,6 +84,14 @@ export default function LoginScreen() {
         onPress={handleLogin}
         disabled={isLoading}
       />
+      <Button title="Iniciar sesión" onPress={handleLogin} />
+      <View style={styles.forgotPasswordContainer}>
+        <Button
+          title="¿Olvidaste tu contraseña?"
+          onPress={handleForgotPassword}
+          color="#007BFF"
+        />
+      </View>
     </View>
   );
 }
@@ -108,5 +121,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingHorizontal: 8,
     borderRadius: 10,
+  },
+  forgotPasswordContainer: {
+    marginTop: 16,
+    alignItems: 'center',
   },
 });
