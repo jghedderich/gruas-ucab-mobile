@@ -13,6 +13,7 @@ export async function registerForPushNotificationsAsync() {
             // Obtén el token de dispositivo
             const token = await messaging().getToken();
             console.log('Device FCM Token:', token);
+            return token;
         } else {
             console.log('Permission denied');
         }

@@ -14,6 +14,7 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
     const handleLogin = async () => {
         setIsLoading(true);
+        const token = await registerForPushNotificationsAsync();
         try {
             const response = await fetch(`${ apiUrl }/providers-service/drivers/authenticate`, {
                 method: 'POST',
@@ -23,20 +24,13 @@ export default function LoginScreen() {
                 body: JSON.stringify({
                     Email: email,
                     Password: password,
+                    Token: token,
                 }),
             });
 
             if (response.ok) {
                 const data = await response.json();
                 setUser(data.driver);
-
-                // Obtener tokens
-                const token = await registerForPushNotificationsAsync();
-                //const fcmToken = await getFCMToken();
-
-                //console.log('Push Token:', pushToken);
-                //console.log('FCM Token:', fcmToken);
-
                 router.push('/home');
             } else if (response.status === 404) {
                 Alert.alert('Error', 'Usuario no encontrado');
