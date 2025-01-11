@@ -21,7 +21,7 @@ interface Dni {
     number: string;
 }
 
-interface User {
+export interface User {
     id: string;
     vehicleId: string;
     providerId: string;
@@ -32,12 +32,14 @@ interface User {
     password: string;
     status: string;
     location?: Location;
+    token?: string;
     isActive: boolean;
 }
 
 interface UserContextType {
   user: User | null; // El usuario autenticado o null si no hay sesión activa
-  setUser: React.Dispatch<React.SetStateAction<User | null>>; // Función para actualizar el usuario
+    setUser: React.Dispatch<React.SetStateAction<User | null>>; // Función para actualizar el usuario
+    updateUser: (driver: User, token: string) => void; // Función para actualizar el usuario
 }
 
 // Crea el contexto
@@ -47,8 +49,12 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  return (
-    <UserContext.Provider value={{ user, setUser }}>
+    const updateUser = (driver: User, token: string) => {
+        setUser({ ...driver, token });
+    };
+
+    return (
+        <UserContext.Provider value={{ user, setUser, updateUser }}>
       {children}
     </UserContext.Provider>
   );

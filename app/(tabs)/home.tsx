@@ -66,14 +66,19 @@ export default function OrderScreen() {
   const { orders, setOrders } = useOrder(); // Estado para almacenar las órdenes
   const [loading, setLoading] = useState(true); // Estado para manejar la carga
   const [error, setError] = useState<string | null>(null); // Estado para manejar errores
-  const fetchOrders = debounce(async () => {
+    const fetchOrders = debounce(async () => {
     if (!user) {
       console.log('No user');
       setLoading(false);
       return;
     }
     try {
-      const response = await fetch(`${apiUrl}/orders-service/orders`);
+        const response = await fetch(`${apiUrl}/orders-service/orders`, {
+            headers: {
+                'Authorization': `Bearer ${user.token}`,
+                'Content-Type': 'application/json',
+            },
+        });
       const data = await response.json();
       const userOrders1 = data.orders.data.filter(
         (order: Order) => order.orderStatus != 'Completed'

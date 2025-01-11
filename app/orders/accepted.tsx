@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useOrder } from '@/app/context/OrderContext';
-import { useUser } from '@/app/context/UserContext';
+import { useUser, User} from '@/app/context/UserContext';
 import { Section } from '@/components/common/Section';
 import { useRouter } from 'expo-router';
 import MapComponent from '@/components/orders/MapComponent';
@@ -11,8 +11,8 @@ import config from '@/app/config';
 import Footer from '@/components/common/Footer';
 import Header from '@/components/common/Header';
 
-const updateOrderStatus = async (orderId: string, orderStatus: string) => {
-  const apiUrl = config.apiBaseUrl; // Asegúrate de que config esté importado
+const updateOrderStatus = async (orderId: string, orderStatus: string, user: User) => {
+    const apiUrl = config.apiBaseUrl; // Asegúrate de que config esté importado
   const requestBody = {
     order: {
       id: orderId,
@@ -24,7 +24,8 @@ const updateOrderStatus = async (orderId: string, orderStatus: string) => {
     const response = await fetch(`${apiUrl}/providers-service/drivers/order`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token}`,
+          'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody),
     });
@@ -53,9 +54,13 @@ export default function AcceptedOrderScreen() {
   }
 
   // Función para manejar el evento de presionar el botón
-  const handleArrival = async () => {
+    const handleArrival = async () => {
+        if (user == null) {
+            router.push('/login');
+            return;
+        }
     try {
-      const respuesta = await updateOrderStatus(order.id, 'Located');
+      const respuesta = await updateOrderStatus(order.id, 'Located', user);
       if (respuesta) {
         console.log('Cliente localizado', order?.id);
         router.push('/orders/identified');
