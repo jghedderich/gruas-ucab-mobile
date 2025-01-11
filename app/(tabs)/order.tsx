@@ -72,7 +72,12 @@ export default function OrderScreen() {
       return;
     }
     try {
-      const response = await fetch(`${apiUrl}/orders-service/orders`);
+        const response = await fetch(`${apiUrl}/orders-service/orders`, {
+            headers: {
+                'Authorization': `Bearer ${user.token}`,
+                'Content-Type': 'application/json',  
+            },
+      });
       const data = await response.json();
       const userOrders1 = data.orders.data.filter(
         (order: Order) => order.orderStatus === 'Completed'

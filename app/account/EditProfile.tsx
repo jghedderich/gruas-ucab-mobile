@@ -78,6 +78,7 @@ export default function AccountScreen() {
                 const response = await fetch(`${apiUrl}/providers-service/drivers`, {
                     method: 'PUT',
                     headers: {
+                        'Authorization': `Bearer ${user?.token}`,
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(updateDriverPayload),

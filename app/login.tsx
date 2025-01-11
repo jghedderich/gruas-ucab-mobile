@@ -7,8 +7,8 @@ import { registerForPushNotificationsAsync } from '../notifications/pushnotifica
 
 export default function LoginScreen() {
   const apiUrl = config.apiBaseUrl;
-  const router = useRouter();
-  const { setUser } = useUser();
+    const router = useRouter();
+    const { user , setUser, updateUser } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +30,7 @@ export default function LoginScreen() {
 
             if (response.ok) {
                 const data = await response.json();
-                setUser(data.driver);
+                updateUser(data.driver, data.token); 
                 router.push('/home');
             } else if (response.status === 404) {
                 Alert.alert('Error', 'Usuario no encontrado');
@@ -72,11 +72,6 @@ export default function LoginScreen() {
         onChangeText={setPassword}
         secureTextEntry
         style={styles.input}
-      />
-      <Button
-        title={isLoading ? 'Cargando...' : 'Iniciar sesión'}
-        onPress={handleLogin}
-        disabled={isLoading}
       />
       <Button title="Iniciar sesión" onPress={handleLogin} />
       <View style={styles.forgotPasswordContainer}>

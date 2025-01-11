@@ -12,7 +12,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import MapComponent from '@/components/orders/MapComponent';
 import { useOrder } from '@/app/context/OrderContext';
-import { useUser } from '@/app/context/UserContext';
+import { useUser, User} from '@/app/context/UserContext';
 import config from '@/app/config';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
@@ -22,8 +22,8 @@ type ServiceRequestDetailRouteParams = {
   orderId: string; // Esto asume que `orderId` es un string, ajusta el tipo si es necesario
 };
 
-const updateOrderStatus = async (orderId: string, orderStatus: string) => {
-  const apiUrl = config.apiBaseUrl; // Asegúrate de que config esté importado
+const updateOrderStatus = async (orderId: string, orderStatus: string, user: User) => {
+    const apiUrl = config.apiBaseUrl; // Asegúrate de que config esté importado
   const requestBody = {
     order: {
       id: orderId,
@@ -35,7 +35,8 @@ const updateOrderStatus = async (orderId: string, orderStatus: string) => {
     const response = await fetch(`${apiUrl}/providers-service/drivers/order`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token}`,
+          'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody),
     });
@@ -76,7 +77,7 @@ export default function ServiceRequestDetail() {
 
   const handleRejectOrder = async () => {
     try {
-      const respuesta = await updateOrderStatus(order.id, 'Canceled');
+      const respuesta = await updateOrderStatus(order.id, 'Canceled', user);
       if (respuesta) {
         console.log('Orden rechazada', order.id);
         navigation.goBack();
@@ -88,7 +89,7 @@ export default function ServiceRequestDetail() {
 
   const handleAcceptOrder = async () => {
     try {
-      const respuesta = await updateOrderStatus(order.id, 'Accepted');
+      const respuesta = await updateOrderStatus(order.id, 'Accepted', user);
       if (respuesta) {
         console.log('Orden aceptada', order.id);
         router.push('/orders/accepted');

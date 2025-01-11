@@ -8,7 +8,7 @@ import {
   ScrollView,
   Modal,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { useUser, User } from '@/app/context/UserContext';
 import { useNavigation } from '@react-navigation/native';
 import { Section } from '@/components/common/Section';
 import { additionalCosts } from '@/app/data/data';
@@ -22,9 +22,10 @@ import Header from '@/components/common/Header';
 const createCostDetail = async (
   orderId: string,
   description: string,
-  amount: number
+    amount: number,
+  user: User
 ) => {
-  const apiUrl = config.apiBaseUrl; // Asegúrate de que config esté importado
+    const apiUrl = config.apiBaseUrl; // Asegúrate de que config esté importado
   const requestBody = {
     costDetail: {
       orderId: orderId,
@@ -37,7 +38,8 @@ const createCostDetail = async (
     const response = await fetch(`${apiUrl}/orders-service/costdetails`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token}`,
+          'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody),
     });
@@ -52,7 +54,8 @@ const createCostDetail = async (
 };
 export default function RequestCostsScreen() {
   const navigation = useNavigation();
-  const router = useRouter();
+    const router = useRouter();
+    const { user } = useUser(); // Obtenemos el usuario logueado del contexto
   const [costs, setCosts] = useState<{ [key: string]: string }>({});
   const [isModalVisible, setModalVisible] = useState(false);
   const { orders, getOrderById, selectedOrderId, fetchOrders } = useOrder();
@@ -74,7 +77,11 @@ export default function RequestCostsScreen() {
   const handleSendRequest = async () => {
     if (!order || !order.id) {
       return;
-    }
+      }
+      if (user == null) {
+          router.push('/login');
+          return;
+      }
     // Verifica si no hay costos adicionales
     if (enteredCosts.length === 0) {
       router.push('/orders/destiny');
@@ -85,7 +92,7 @@ export default function RequestCostsScreen() {
           if (!cost.name || !cost.value) {
             continue;
           }
-          await createCostDetail(order?.id, cost.name, parseFloat(cost.value));
+          await createCostDetail(order?.id, cost.name, parseFloat(cost.value),user);
         } catch (error) {
           console.error('Error creating cost detail:', error);
         }

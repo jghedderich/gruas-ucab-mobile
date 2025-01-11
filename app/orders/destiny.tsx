@@ -5,12 +5,13 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import config from '@/app/config';
+import { useUser, User } from '@/app/context/UserContext';
 import { useOrder } from '@/app/context/OrderContext';
 import Footer from '@/components/common/Footer';
 import Header from '@/components/common/Header';
 
-const updateOrderStatus = async (orderId: string, orderStatus: string) => {
-  const apiUrl = config.apiBaseUrl; // Asegúrate de que config esté importado
+const updateOrderStatus = async (orderId: string, orderStatus: string, user: User) => {
+    const apiUrl = config.apiBaseUrl; // Asegúrate de que config esté importado
   const requestBody = {
     order: {
       id: orderId,
@@ -22,7 +23,8 @@ const updateOrderStatus = async (orderId: string, orderStatus: string) => {
     const response = await fetch(`${apiUrl}/providers-service/drivers/order`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token}`,
+          'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody),
     });
@@ -36,16 +38,21 @@ const updateOrderStatus = async (orderId: string, orderStatus: string) => {
 };
 export default function DestinyScreen() {
   const navigation = useNavigation();
-  const router = useRouter();
+    const router = useRouter();
+    const { user } = useUser(); // Obtenemos el usuario logueado del contexto
   const { orders, getOrderById, selectedOrderId, fetchOrders } = useOrder();
   const order = selectedOrderId ? getOrderById(selectedOrderId) : undefined;
   if (!order || !order.id) {
     return;
   }
   const handlePerformService = async () => {
-    // Aquí implementar lógica adicional
+      // Aquí implementar lógica adicional
+      if (user == null) {
+          router.push('/login');
+          return;
+      }
     try {
-      const respuesta = await updateOrderStatus(order.id, 'Completed');
+      const respuesta = await updateOrderStatus(order.id, 'Completed', user);
       if (respuesta) {
         console.log('Conductor ha confirmado que ha realizado el servicio.');
         router.push('/orders/success');

@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
-  ScrollView,
-  Text,
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Image,
+    ScrollView,
+    Text,
+    StyleSheet,
+    View,
+    TouchableOpacity,
+    Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useProfile } from '@/app/context/ProfileContext'; // Importa el hook
@@ -17,74 +17,86 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { ThemedText } from '@/components/ThemedText';
 
 export default function DriverProfileScreen() {
-  const apiUrl = config.apiBaseUrl;
-  const { user, setUser } = useUser();
-  const router = useRouter();
-  const statusColors: Record<string, string> = {
-    Available: '#4CAF50',
-    Unavailable: '#F44336',
-  };
+    const apiUrl = config.apiBaseUrl;
+    const { user, setUser, updateUser } = useUser();
+    const router = useRouter();
+    const statusColors: Record<string, string> = {
+        Available: '#4CAF50',
+        Unavailable: '#F44336',
+    };
 
-  const [currentStatus, setCurrentStatus] = useState<string>(
-    user?.status || 'Available'
-  );
-  const { provider, vehicle } = useProfile();
+    const [currentStatus, setCurrentStatus] = useState<string>(
+        user?.status || 'Available'
+    );
+    const { provider, vehicle } = useProfile();
 
-  const toggleStatus = async () => {
-    const statusOrder: string[] = ['Available', 'Unavailable'];
-    const currentIndex = statusOrder.indexOf(currentStatus);
-    const nextIndex = (currentIndex + 1) % statusOrder.length;
-    const newStatus = statusOrder[nextIndex];
+    const toggleStatus = async () => {
+        const statusOrder: string[] = ['Available', 'Unavailable'];
+        const currentIndex = statusOrder.indexOf(currentStatus);
+        const nextIndex = (currentIndex + 1) % statusOrder.length;
+        const newStatus = statusOrder[nextIndex];
 
-    setCurrentStatus(newStatus);
+        setCurrentStatus(newStatus);
 
-    try {
-      const response = await fetch(
-        `${apiUrl}/providers-service/drivers/status`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            driver: {
-              id: user?.id,
-              status: newStatus,
-            },
-          }),
+        try {
+            const response = await fetch(
+                `${apiUrl}/providers-service/drivers/status`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${user?.token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        driver: {
+                            id: user?.id,
+                            status: newStatus,
+                        },
+                    }),
+                }
+            );
+
+            const data = await response.json();
+        } catch (error) {
+            console.error('Error de red al intentar actualizar el estado:', error);
+            setCurrentStatus(currentStatus);
         }
-      );
+    };
 
-      const data = await response.json();
-    } catch (error) {
-      console.error('Error de red al intentar actualizar el estado:', error);
-      setCurrentStatus(currentStatus);
-    }
-  };
+    const handleLogout = () => {
+        setUser(null);
+        router.push('/login');
+    };
 
-  const handleLogout = () => {
-    setUser(null);
-    router.push('/login');
-  };
+    const fetchDriverData = debounce(async () => {
+        // Cada vez que vuelva el foco volvemos a pedir el conductor para ver si algo cambio!
+        if (user == null) {
+            router.push('/login');
+            return;
+        }
+        try {
+            const driverResponse = await fetch(
+                `${apiUrl}/providers-service/drivers/${user.id}`, {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json',
+                },
+            }
+            );
+            const driverData = await driverResponse.json();
+            if (user.token) {
+                updateUser(driverData.driver, user.token);
+            }
+        } catch (error) {
+            console.error('Error de red al intentar encontrar el conductor:', error);
+        }
+    }, 300);
 
-  const fetchDriverData = debounce(async () => {
-    // Cada vez que vuelva el foco volvemos a pedir el conductor para ver si algo cambio!
-    try {
-      const driverResponse = await fetch(
-        `${apiUrl}/providers-service/drivers/${user?.id}`
-      );
-      const driverData = await driverResponse.json();
-      setUser(driverData.driver);
-    } catch (error) {
-      console.error('Error de red al intentar encontrar el conductor:', error);
-    }
-  }, 300);
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchDriverData();
-    }, []) // Dependencias
-  );
+    useFocusEffect(
+        useCallback(() => {
+            fetchDriverData();
+        }, []) // Dependencias
+    );
 
   return (
     <ScrollView style={styles.container}>

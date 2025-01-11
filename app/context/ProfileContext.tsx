@@ -46,12 +46,22 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
             if (user && user.providerId && user.vehicleId) {
                 try {
                     const providerResponse = await fetch(
-                        `${apiUrl}/providers-service/providers/${user.providerId}`
+                        `${apiUrl}/providers-service/providers/${user.providerId}`,{
+                            headers: {
+                                'Authorization': `Bearer ${user.token}`,
+                                'Content-Type': 'application/json',
+                            },
+                        }
                     );
                     const providerData = await providerResponse.json();
                     setProvider(providerData.provider);
                     const vehicleResponse = await fetch(
-                        `${apiUrl}/providers-service/vehicles/${user.vehicleId}`
+                        `${apiUrl}/providers-service/vehicles/${user.vehicleId}`, {
+                            headers: {
+                                'Authorization': `Bearer ${user.token}`,
+                                'Content-Type': 'application/json',
+                            },
+                        }
                     );
                     const vehicleData = await vehicleResponse.json();
                     setVehicle(vehicleData.vehicle);
