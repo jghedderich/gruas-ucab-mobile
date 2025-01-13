@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,12 @@ import { useOrder } from '@/app/context/OrderContext';
 import { useUser, User} from '@/app/context/UserContext';
 import config from '@/app/config';
 import Header from '@/components/common/Header';
+import * as Location from 'expo-location';
 import Footer from '@/components/common/Footer';
+
+import { Alert } from 'react-native';
+import { getLocation } from '@/app/metodos';
+
 
 // Define los parámetros esperados en la ruta
 type ServiceRequestDetailRouteParams = {
@@ -24,15 +29,22 @@ type ServiceRequestDetailRouteParams = {
 
 const updateOrderStatus = async (orderId: string, orderStatus: string, user: User) => {
     const apiUrl = config.apiBaseUrl; // Asegúrate de que config esté importado
+    const address = await getLocation(); 
   const requestBody = {
     order: {
       id: orderId,
-      status: orderStatus,
+      orderStatus: orderStatus,
+          addressLine1: address.addressLine1,
+          addressLine2: address.addressLine2,
+          zip: address.zip,
+          city: address.city,
+          state: address.state,
+          latitude: address.latitude.toFixed(5).toString().slice(0, 8),
+          longitude: address.longitude.toFixed(5).toString().slice(0, 8)
     },
-  };
-
+    };
   try {
-    const response = await fetch(`${apiUrl}/providers-service/drivers/order`, {
+      const response = await fetch(`${apiUrl}/orders-service/orders/progress`, {
       method: 'PUT',
       headers: {
           'Authorization': `Bearer ${user?.token}`,
@@ -49,7 +61,7 @@ const updateOrderStatus = async (orderId: string, orderStatus: string, user: Use
   }
 };
 export default function ServiceRequestDetail() {
-  const router = useRouter();
+    const router = useRouter();
   const navigation = useNavigation();
   const { user } = useUser();
   const { getOrderById, selectedOrderId } = useOrder();
@@ -60,7 +72,9 @@ export default function ServiceRequestDetail() {
         <Text>Usuario no encontrado.</Text>
       </SafeAreaView>
     );
-  }
+    }
+
+
 
   const order = selectedOrderId ? getOrderById(selectedOrderId) : undefined;
   if (!order || order.driverId !== user.id) {
