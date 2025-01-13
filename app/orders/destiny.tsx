@@ -9,18 +9,27 @@ import { useUser, User } from '@/app/context/UserContext';
 import { useOrder } from '@/app/context/OrderContext';
 import Footer from '@/components/common/Footer';
 import Header from '@/components/common/Header';
+import { getLocation } from '@/app/metodos';
 
 const updateOrderStatus = async (orderId: string, orderStatus: string, user: User) => {
     const apiUrl = config.apiBaseUrl; // Asegúrate de que config esté importado
-  const requestBody = {
-    order: {
-      id: orderId,
-      status: orderStatus,
-    },
-  };
+    const address = await getLocation(); 
+    const requestBody = {
+        order: {
+            id: orderId,
+            orderStatus: orderStatus,
+            addressLine1: address.addressLine1,
+            addressLine2: address.addressLine2,
+            zip: address.zip,
+            city: address.city,
+            state: address.state,
+            latitude: address.latitude.toFixed(5).toString().slice(0, 8),
+            longitude: address.longitude.toFixed(5).toString().slice(0, 8)
+        },
+    };
 
   try {
-    const response = await fetch(`${apiUrl}/providers-service/drivers/order`, {
+      const response = await fetch(`${apiUrl}/orders-service/orders/progress`, {
       method: 'PUT',
       headers: {
           'Authorization': `Bearer ${user?.token}`,

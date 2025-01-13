@@ -33,7 +33,7 @@
     "expo-env": "^1.1.1",
     "expo-font": "~13.0.1",
     "expo-linking": "~7.0.3",
-    "expo-location": "^18.0.4",
+    "expo-location": "~18.0.5",
     "expo-notifications": "~0.29.11",
     "expo-router": "^4.0.11",
     "expo-splash-screen": "~0.29.13",

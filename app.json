@@ -15,7 +15,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.gruasucab.mobile"
+      "bundleIdentifier": "com.gruasucab.mobile",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Esta app necesita acceso a tu ubicacion!."
+      }
     },
     "android": {
       "config": {
