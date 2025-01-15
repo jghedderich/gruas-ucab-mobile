@@ -1,26 +1,50 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, Button, Alert, Text } from 'react-native';
 import { useRouter } from 'expo-router';
-
+import config from './config';
 export default function ForgotPasswordScreen() {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
+    const router = useRouter();
+    const apiUrl = config.apiBaseUrl;
+    const [email, setEmail] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
 
-  const handleRecoverPassword = () => {
-    if (email.trim() === '') {
-      Alert.alert('Error', 'Por favor ingresa tu correo.');
-      return;
-    }
+    const handleRecoverPassword = async () => {
+        if (email.trim() === '') {
+            Alert.alert('Error', 'Por favor ingresa tu correo.');
+            return;
+        }
 
-    // Aquí va la logica para el envio del correo
-    Alert.alert(
-      'Recuperación de contraseña',
-      `Se ha enviado un correo de recuperación a: ${email}`
-    );
+        setIsLoading(true);
 
-    router.push('/enter-code'); 
-  };
+        try {
+            const response = await fetch(`${apiUrl}/providers-service/request-code`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    Email: email,
+                    Type: 'drivers',
+                }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                Alert.alert('Recuperación de contraseña', `Se ha enviado un correo de recuperación a: ${ email }`);
+                router.push('/enter-code');
+            } else if (response.status === 404) {
+                Alert.alert('Error', 'Usuario no encontrado');
+            } else {
+                Alert.alert('Error', 'Ocurrió un error inesperado');
+            }
+        } catch (error) {
+            Alert.alert('Error', 'No se pudo conectar al servidor');
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
   return (
     <View style={styles.container}>

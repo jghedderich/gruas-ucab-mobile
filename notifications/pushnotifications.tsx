@@ -1,4 +1,5 @@
 import messaging from '@react-native-firebase/messaging';
+import { Alert } from 'react-native';
 
 export async function registerForPushNotificationsAsync() {
     try {
@@ -13,6 +14,7 @@ export async function registerForPushNotificationsAsync() {
             // Obtén el token de dispositivo
             const token = await messaging().getToken();
             console.log('Device FCM Token:', token);
+
             return token;
         } else {
             console.log('Permission denied');
