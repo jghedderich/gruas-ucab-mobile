@@ -16,9 +16,10 @@ export default function LoginScreen() {
         setIsLoading(true);
         const token = await registerForPushNotificationsAsync();
         try {
-            const response = await fetch(`${ apiUrl }/providers-service/drivers/authenticate`, {
+            const response = await fetch(`https://9b98-149-102-244-105.ngrok-free.app/providers-service/drivers/authenticate`, {
                 method: 'POST',
                 headers: {
+                    'ngrok-skip-browser-warning': '1',
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
@@ -27,7 +28,7 @@ export default function LoginScreen() {
                     Token: token,
                 }),
             });
-
+            console.log(response);
             if (response.ok) {
                 const data = await response.json();
                 updateUser(data.driver, data.token); 
@@ -40,7 +41,11 @@ export default function LoginScreen() {
                 Alert.alert('Error', 'Ocurrió un error inesperado');
             }
         } catch (error) {
-            Alert.alert('Error', 'No se pudo conectar al servidor');
+            if (error instanceof Error) {
+                Alert.alert('Error', `No se pudo conectar al servidor: ${error.message}`);
+            } else {
+                Alert.alert('Error', 'No se pudo conectar al servidor');
+            }
             console.error(error);
         } finally {
             setIsLoading(false);
