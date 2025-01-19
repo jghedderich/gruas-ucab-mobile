@@ -37,8 +37,8 @@ export default function RootLayout() {
         messaging().onMessage(async remoteMessage => {
             Toast.show({
                 type: 'info',
-                text1: 'New FCM Message',
-                text2: JSON.stringify(remoteMessage),
+                text1: remoteMessage.notification?.title,
+                text2: JSON.stringify(remoteMessage.notification?.body),
                 position: 'top',
             });
         });
