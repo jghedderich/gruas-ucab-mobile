@@ -1,54 +1,79 @@
-import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView, StyleSheet, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  Modal,
+} from 'react-native';
 import { Section } from '@/components/common/Section';
-import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
+import { useOrder } from '@/app/context/OrderContext';
+import Header from '@/components/common/Header';
+import Footer from '@/components/common/Footer';
 
 export default function CostsStatusScreen() {
   const router = useRouter();
   const navigation = useNavigation();
-  const [orderStatus, setOrderStatus] = useState<'approved' | 'rejected' | 'pending' | null>(null);
+  const [orderStatus, setOrderStatus] = useState<
+    'approved' | 'rejected' | 'pending' | null
+  >(null);
   const [showModal, setShowModal] = useState(false); // Control del modal
+  const { getOrderById, selectedOrderId, fetchOrders } = useOrder();
 
-  const checkOrderStatus = () => {
-    // Define los estados válidos
-    const statuses: Array<'approved' | 'rejected' | 'pending'> = ['approved', 'rejected', 'pending'];
-  
-    // Simula un estado aleatorio
-    const simulatedStatus = statuses[Math.floor(Math.random() * statuses.length)];
-    setOrderStatus(simulatedStatus); 
-  
-    setShowModal(true);
-  
-    if (simulatedStatus === 'approved') {
-      setTimeout(() => {
-        setShowModal(false);
-        router.push('/orders/destiny'); // Redirige si está aprobada
-      }, 5000);
-    } else if (simulatedStatus === 'rejected') {
+  const order = selectedOrderId ? getOrderById(selectedOrderId) : undefined;
+
+  const checkOrderStatus = async () => {
+    fetchOrders();
+    if (!order || !order.costDetails) {
+      setOrderStatus(null);
+      setShowModal(true);
+      return;
+    }
+    let hasRejected = false;
+    let hasPending = false;
+    for (let i = 0; i < order.costDetails.length; i++) {
+      const costdetail = order.costDetails[i];
+      if (costdetail.statusC === 'Rejected') {
+        hasRejected = true;
+        break;
+      } else if (costdetail.statusC === 'Pending') {
+        hasPending = true;
+      }
+    }
+    if (hasRejected) {
+      setOrderStatus('rejected');
+      setShowModal(true);
       setTimeout(() => {
         setShowModal(false);
         navigation.goBack(); // Redirige si está rechazada
-      }, 5000);
-    } else if (simulatedStatus === 'pending') {
+      }, 3000);
+    } else if (hasPending) {
+      setOrderStatus('pending');
+      setShowModal(true);
       setTimeout(() => {
-        setShowModal(false); 
-      }, 5000);
+        setShowModal(false);
+      }, 3000);
+    } else {
+      setOrderStatus('approved');
+      setShowModal(true);
+      setTimeout(() => {
+        setShowModal(false);
+        router.push('/orders/destiny'); // Redirige si está aprobada
+      }, 3000);
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>Opciones del Servicio</Text>
-      </View>
+      <Header
+        title="Opciones del Servicio"
+        onBack={() => navigation.goBack()}
+      />
 
-      {/* Scrollable Content */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Section
           title="Su solicitud ha sido enviada"
@@ -62,11 +87,12 @@ export default function CostsStatusScreen() {
       </ScrollView>
 
       {/* Footer */}
-      <View style={styles.footer}>
+
+      <Footer>
         <TouchableOpacity onPress={checkOrderStatus} style={styles.checkButton}>
           <Text style={styles.checkButtonText}>Verificar estado</Text>
         </TouchableOpacity>
-      </View>
+      </Footer>
 
       {/* Modal */}
       <Modal visible={showModal} transparent animationType="fade">
@@ -108,14 +134,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
-    marginTop: 60,
-  },
   headerText: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -133,13 +151,6 @@ const styles = StyleSheet.create({
     height: 250,
     alignSelf: 'center',
     marginTop: 36,
-  },
-  footer: {
-    width: '100%',
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#E5E5E5',
-    backgroundColor: '#fff',
   },
   checkButton: {
     backgroundColor: '#007BFF',
